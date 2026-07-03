@@ -2,7 +2,7 @@
 
 An interactive teaching tool for ASTRAL's detection KPIs — learn the seven metrics by playing.
 
-**Live demo:** https://YOUR-GITHUB-USERNAME.github.io/astral-kpi-sandbox/
+**Live demo:** https://shubhudharmadhikari-commits.github.io/astral-kpi-sandbox/
 
 ASTRAL reads a sea of AI-interaction logs, scores each session for biological-misuse risk, and
 surfaces the few worth a human review. This sandbox lets someone with no statistics background
