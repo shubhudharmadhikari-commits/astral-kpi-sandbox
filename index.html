@@ -103,6 +103,16 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .sb-delta.steady{color:var(--ink-faint);background:transparent}
 .sb-note{font-size:11.5px;color:var(--ink-dim)}
 @media(max-width:760px){.sb-note{display:none}.sb-meter{width:90px}}
+/* "why did that happen?" insight banner */
+.whybox{position:relative;display:flex;gap:13px;align-items:flex-start;margin:0 0 6px;padding:13px 40px 13px 15px;border:1px solid var(--amber-dim);border-left:3px solid var(--amber);border-radius:11px;background:linear-gradient(100deg,rgba(231,178,76,.13),rgba(231,178,76,.03));animation:whyin .3s ease}
+@keyframes whyin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.whybox{animation:none}}
+.whyi{flex:0 0 auto;font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--amber);text-transform:uppercase;padding-top:3px;white-space:nowrap}
+.whyt{font-size:13.5px;color:var(--ink);line-height:1.55}
+.whyt b{color:var(--amber-soft)}
+.whyx{position:absolute;top:7px;right:9px;background:transparent;border:0;color:var(--ink-faint);font-size:18px;line-height:1;padding:1px 6px;border-radius:6px}
+.whyx:hover{color:var(--ink);background:var(--panel-3)}
+@media(max-width:640px){.whyi{display:none}}
 
 /* ===== tab bar ===== */
 .tabs{display:flex;gap:2px;padding:0 10px;overflow-x:auto;border-top:1px solid var(--line)}
@@ -413,14 +423,14 @@ function ticks(sc,xs,ys){let s='';const {W,H,m}=sc;
 /* ============================================================= *  Actions  * ============================================================= */
 const SLIDERS={}, CELLS={};
 function onLever(key,raw){let v=parseFloat(raw);if(key==='pi')v=Math.pow(10,v);
-  if(key==='k'||key==='nAudit')v=Math.round(v);STATE[key]=v;STATE.auditRoll=null;noteOutcome();renderLite();}
+  if(key==='k'||key==='nAudit')v=Math.round(v);STATE[key]=v;STATE.auditRoll=null;STATE.lastLever=key;noteOutcome();renderLite();}
 function setTab(i){STATE.tab=clamp(i,0,TABS.length-1);render();window.scrollTo({top:0,behavior:'smooth'});}
 function toggleOpen(id){STATE.open[id]=!STATE.open[id];renderContent();}
 function setMode(m){STATE.mode=m;noteOutcome();render();}
 function resetLevers(){Object.assign(STATE,{pi:.01,sep:1.8,tau:.6,k:50,beta:2,pEvade:0,pDual:0,preset:'baseline',nAudit:500,auditRoll:null});noteOutcome();render();}
 function applyPreset(name){const p=PRESETS[name];if(!p)return;
   Object.assign(STATE,{pEvade:0,pDual:0},p.patch,{preset:name,auditRoll:null});noteOutcome();render();}
-function setSlider(key,val){STATE[key]=val;noteOutcome();render();}
+function setSlider(key,val){STATE[key]=val;STATE.lastLever=key;noteOutcome();render();}
 function rollAudit(){const D=deriveState(STATE);if(!D.unflagged.length){STATE.auditRoll=null;renderContent();return;}
   const seed=(STATE.auditRoll?STATE.auditRoll.seed+1:1);const rng=mulberry32((STATE.seed*7+seed)|0);
   const n=Math.min(STATE.nAudit,D.unflagged.length);const pool=D.unflagged.slice();let found=0;
@@ -469,8 +479,23 @@ function patchControls(){
   patchHealth();
 }
 /* north-star outcome signal — F2 is the single "is ASTRAL doing its job" score (recall weighted 4x) */
-function noteOutcome(){const f=deriveState(STATE).Fb;const v=(f==null||!isFinite(f))?0:f;
-  STATE.f2Delta=(STATE.lastF2==null)?0:(v-STATE.lastF2);STATE.lastF2=v;}
+function noteOutcome(){const D=deriveState(STATE);
+  const f=(D.Fb==null||!isFinite(D.Fb))?0:D.Fb, r=(D.R==null)?0:D.R, p=(D.P==null)?0:D.P;
+  STATE.f2Delta=(STATE.lastF2==null)?0:(f-STATE.lastF2);
+  STATE.rDelta=(STATE.lastR==null)?0:(r-STATE.lastR);
+  STATE.pDelta=(STATE.lastP==null)?0:(p-STATE.lastP);
+  STATE.lastF2=f;STATE.lastR=r;STATE.lastP=p;STATE.whyOff=false;}
+/* "why did that happen?" — surface a plain-language note whenever the result defies a beginner's naive expectation */
+function whyNote(){
+  const fd=STATE.f2Delta||0,rd=STATE.rDelta||0,eps=8e-4,L=STATE.lastLever;
+  if(L==='beta'&&Math.abs(fd)>eps) return {t:'F2 moved — but ASTRAL didn’t get better or worse',b:'β changes the <em>ruler</em>, not the detector. You re-weighted how much a missed threat counts vs. a false alarm; the underlying precision and recall are unchanged.'};
+  if(L==='k'&&Math.abs(fd)<=eps) return {t:'Capacity didn’t move the north-star',b:'F2 is about the detector’s overall precision and recall, which don’t depend on how many sessions a reviewer can open. Capacity <b>k</b> shows up in <b>precision@k</b>, <b>NDCG@k</b>, and alert fatigue instead.'};
+  if(L==='pi'&&Math.abs(fd)>eps) return {t:'The world changed — not the detector',b:`You changed how <em>rare</em> misuse is. ASTRAL is identical, but rarer misuse means more false alarms per real catch, so the same detector looks ${fd<0?'worse':'better'}. That gap is the <b>base-rate effect</b>.`};
+  if(rd<-eps&&fd>eps) return {t:'You’re missing more — yet the score went up?',b:'Flagging fewer sessions means more real misuse slips by (recall ↓). But at this rare base rate the queue is mostly false alarms, so <b>precision is the bottleneck</b> — trimming flags lifted it more than the extra misses cost you. Keep sliding and F2 eventually falls as recall gets too small.'};
+  if(rd>eps&&fd<-eps) return {t:'You’re catching more — yet the score dropped?',b:'You caught more real misuse (recall ↑), but at a rare base rate, flagging more <b>floods the queue with false alarms</b> faster than it adds real catches — so precision craters and F2 falls.'};
+  return null;}
+function whyBanner(){if(STATE.whyOff)return '';const w=whyNote();if(!w)return '';
+  return `<div class="whybox"><button class="whyx" onclick="STATE.whyOff=true;renderContent()" aria-label="dismiss">×</button><span class="whyi">💡 why did that happen?</span><div class="whyt"><b>${w.t}</b> ${w.b}</div></div>`;}
 function healthBar(){
   const D=deriveState(STATE),f2=(D.Fb==null||!isFinite(D.Fb))?0:D.Fb,d=STATE.f2Delta||0,P=D.P,R=D.R;
   const dir=Math.abs(d)<5e-4?{c:'steady',a:'•',w:'holding steady'}:d>0?{c:'up',a:'▲',w:'better'}:{c:'down',a:'▼',w:'worse'};
@@ -512,7 +537,7 @@ function render(){syncSliders();patchControls();renderTabs();renderContent();}  
 function renderLite(){patchControls();renderContent();}                          // slider drag (don't touch sliders)
 function renderContent(){
   const D=deriveState(STATE),t=TABS[STATE.tab];
-  document.getElementById('content').innerHTML=tabHead(t)+guideBox(t)+t.render(D)+navBox(STATE.tab);
+  document.getElementById('content').innerHTML=whyBanner()+tabHead(t)+guideBox(t)+t.render(D)+navBox(STATE.tab);
   wireDrag();
   document.querySelectorAll('.collapse.open .body').forEach(b=>b.style.maxHeight=b.scrollHeight+40+'px');
 }
@@ -995,7 +1020,7 @@ function startDrag(kind,el,e0){
     else if(kind==='rocPt'){const frac=clamp((px-42)/(340-58),0,1);
       const zc=(-STATE.sep/2)-invPhi(clamp(frac,1e-4,1-1e-4));
       STATE.tau=clamp(sigmoid(A_GAIN*zc),0.02,0.98);}
-    STATE.auditRoll=null;noteOutcome();if(RAF)cancelAnimationFrame(RAF);RAF=requestAnimationFrame(render);}
+    STATE.auditRoll=null;STATE.lastLever='tau';noteOutcome();if(RAF)cancelAnimationFrame(RAF);RAF=requestAnimationFrame(render);}
   apply(e0);   // jump to wherever you first clicked
   function up(){window.removeEventListener('pointermove',apply);window.removeEventListener('pointerup',up);}
   window.addEventListener('pointermove',apply);window.addEventListener('pointerup',up);}
