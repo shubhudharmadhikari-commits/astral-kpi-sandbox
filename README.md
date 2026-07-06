@@ -9,8 +9,8 @@ surfaces the few worth a human review. This sandbox lets someone with no statist
 *feel* what the detection metrics mean: one shared synthetic world driven by a few dials, where
 moving any dial makes every metric react at once.
 
-Covers Guided Discovery lessons for signal rarity, threshold tradeoffs, base-rate effects, false-alarm load,
-audit visibility, ROC vs PR interpretation, actor-tier hiding, and ranked reviewer attention. The Reference layer
+Covers Guided Discovery lessons for the core ASTRAL evaluation loop, signal rarity, threshold tradeoffs, base-rate
+effects, false-alarm load, audit visibility, ROC vs PR interpretation, actor-tier hiding, and ranked reviewer attention. The Reference layer
 keeps F2 (North-Star) · Precision · False Positive Rate · Recall · ROC-AUC · PR-AUC · NDCG@k · Attribution
 (weighted κ), plus a live **north-star** better/worse signal, Batch vs Operational mode, dark/light themes, and
 an "Under the hood — for the curious" panel on every tab.
