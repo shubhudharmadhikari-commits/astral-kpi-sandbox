@@ -19,24 +19,24 @@
   --ink:#dce7ff; --ink-dim:#93a4cc; --ink-faint:#5f6f96;
   /* focus — the one signal that glows */
   --amber:#e7b24c; --amber-soft:#f2c877; --amber-dim:#7c5f2b;
-  /* warm — "act": misuse / danger */
+  /* warm — "act": misuse / elevated-risk behavior */
   --red:#ec6a4f; --red-soft:#f28e78;
-  /* cool — "calm": benign. (green is REPURPOSED to stellar — green never signals status) */
-  --green:#84a9ff; --green-soft:#c9d8ff; --blue:#84a9ff; --blue-soft:#b3c8ff; --violet:#5b78e6;
+  /* cool — "calm": benign / everyday activity */
+  --blue:#84a9ff; --blue-soft:#b3c8ff; --violet:#5b78e6;
   /* biological — brand & motif ONLY, never a status */
-  --spindle:#4fc2a0; --filament:#8fe6cc; --indigo:#3a5bd9; --stellar:#84a9ff; --signal:#e7b24c;
+  --spindle:#4fc2a0; --filament:#8fe6cc; --indigo:#3a5bd9; --stellar:#84a9ff; --stellar-lt:#c9d8ff; --signal:#e7b24c;
   --mono:'IBM Plex Mono','SF Mono',ui-monospace,Menlo,monospace;
   --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --display:'Space Grotesk','IBM Plex Sans',system-ui,sans-serif;
-  --radius:12px; --shadow:0 2px 18px -8px rgba(0,0,0,.72);
+  --radius:8px; --shadow:0 2px 18px -8px rgba(0,0,0,.72);
 }
 html[data-theme="light"]{
   --bg:#eef2fb; --panel:#ffffff; --panel-2:#f5f8ff; --panel-3:#e8eefa; --line:#d6deef; --line-bright:#c0cce4;
   --ink:#132241; --ink-dim:#55658c; --ink-faint:#8fa0c0;
   --amber:#c98a12; --amber-soft:#d99f26; --amber-dim:#e6cc8f;
   --red:#d95632; --red-soft:#e0714f;
-  --green:#4a6fd8; --green-soft:#6f8fe6; --blue:#4a6fd8; --blue-soft:#7d99e6; --violet:#3f52c0;
-  --spindle:#2e8e74; --filament:#3fa588; --indigo:#3a5bd9; --stellar:#4a6fd8; --signal:#c98a12;
+  --blue:#4a6fd8; --blue-soft:#7d99e6; --violet:#3f52c0;
+  --spindle:#2e8e74; --filament:#3fa588; --indigo:#3a5bd9; --stellar:#4a6fd8; --stellar-lt:#6f8fe6; --signal:#c98a12;
   --shadow:0 2px 16px -8px rgba(30,50,90,.28);
 }
 html[data-theme="light"] body{background:
@@ -45,6 +45,7 @@ html[data-theme="light"] body{background:
 html[data-theme="light"] .chrome{background:rgba(238,242,251,.86)}
 html[data-theme="light"] .welcome{background:rgba(206,216,238,.72)}
 html[data-theme="light"] .seg button.on{color:#20160a}
+html[data-theme="light"] .viewseg button.on{color:#20160a}
 html[data-theme="light"] .wstep .num,html[data-theme="light"] .wgo .primary{color:#3a2708}
 *{box-sizing:border-box}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
@@ -71,11 +72,17 @@ button{font-family:inherit;cursor:pointer}
 .top .tag b{color:var(--amber)}
 .ghostbtn{background:transparent;border:1px solid var(--line-bright);color:var(--ink-dim);font-size:11px;padding:6px 11px;border-radius:7px;transition:.15s}
 .ghostbtn:hover{color:var(--ink);border-color:var(--amber-dim);background:var(--panel)}
+.viewseg{display:inline-flex;border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;background:rgba(11,17,32,.55)}
+.viewseg button{background:transparent;border:0;color:var(--ink-dim);font-size:11px;padding:7px 12px;transition:.15s}
+.viewseg button.on{background:var(--amber);color:#20160a;font-weight:700}
+.viewseg button:not(.on):hover{color:var(--ink);background:var(--panel-2)}
 
 /* ===== control bar ===== */
 .controls{border-top:1px solid var(--line);padding:9px 16px 4px;display:flex;gap:6px 16px;align-items:flex-end;flex-wrap:wrap}
 .cell{min-width:150px;flex:1 1 150px;position:relative}
 .cell.spot::after{content:'';position:absolute;left:0;right:0;bottom:-3px;height:2px;background:linear-gradient(90deg,var(--amber),transparent);border-radius:2px}
+.cell.flash{animation:leverflash .9s ease}
+@keyframes leverflash{0%{box-shadow:0 0 0 0 rgba(231,178,76,.0)}35%{box-shadow:0 0 0 4px rgba(231,178,76,.18)}100%{box-shadow:0 0 0 0 rgba(231,178,76,0)}}
 .clabel{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--ink-dim);margin-bottom:2px;gap:8px}
 .clabel b{color:var(--ink);font-weight:600}
 .clabel .val{font-family:var(--mono);color:var(--amber);font-size:12px;font-weight:500}
@@ -115,15 +122,26 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 @media(max-width:640px){.whyi{display:none}}
 
 /* ===== tab bar ===== */
-.tabs{display:flex;gap:2px;padding:0 10px;overflow-x:auto;border-top:1px solid var(--line)}
+.tabs{display:flex;gap:2px;padding:0 10px;overflow-x:auto;border-top:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tabs button{background:transparent;border:0;border-bottom:2px solid transparent;color:var(--ink-dim);font-size:12.5px;padding:10px 13px;white-space:nowrap;transition:.15s}
 .tabs button .n{font-family:var(--mono);color:var(--ink-faint);margin-right:6px;font-size:11px}
 .tabs button:hover{color:var(--ink)}
 .tabs button.on{color:var(--ink);border-bottom-color:var(--amber)}
 .tabs button.on .n{color:var(--amber)}
+.tabs.hide{display:none}
+.lessonbar{display:flex;gap:6px;padding:8px 10px 0;overflow-x:auto;border-top:1px solid var(--line);scrollbar-width:none}
+.lessonbar::-webkit-scrollbar{display:none}
+.lessonbar.hide{display:none}
+.lessonbar button{background:transparent;border:1px solid var(--line);color:var(--ink-dim);font-size:11px;border-radius:8px;padding:7px 10px;white-space:nowrap;transition:.15s}
+.lessonbar button .n{font-family:var(--mono);color:var(--ink-faint);margin-right:6px}
+.lessonbar button.on{color:var(--ink);border-color:var(--amber-dim);background:rgba(231,178,76,.08)}
+.lessonbar button.on .n{color:var(--amber)}
+.lessonbar button:hover{color:var(--ink);border-color:var(--line-bright);background:var(--panel)}
 
 /* ===== content ===== */
 .wrap{max-width:1120px;margin:0 auto;padding:24px 20px 96px}
+.wrap.discover-wrap{max-width:1220px}
 .tabhead h2{font-size:22px;letter-spacing:-.015em;text-wrap:balance}
 .dirchip{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.02em;color:var(--ink-dim);border:1px solid var(--line-bright);border-radius:20px;padding:2px 10px;margin-top:8px}
 .dirchip b{color:var(--amber);font-weight:700}
@@ -157,7 +175,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .chip .sublab{font-size:10px;color:var(--ink-faint);margin-top:3px}
 .chip.hero{background:linear-gradient(160deg,rgba(231,178,76,.13),var(--panel-2))}
 .chip.hero::before{background:var(--amber)} .chip.hero .big{font-size:34px;color:var(--amber)}
-.chip.good::before{background:var(--green)} .chip.good .big{color:var(--green-soft)}
+.chip.good::before{background:var(--stellar)} .chip.good .big{color:var(--stellar-lt)}
 .chip.bad::before{background:var(--red)} .chip.bad .big{color:var(--red-soft)}
 .chip.info::before{background:var(--blue)} .chip.info .big{color:var(--blue-soft)}
 .chip.benign::before{background:var(--stellar)} .chip.benign .big{color:var(--blue-soft)}
@@ -173,13 +191,67 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .collapse .body{max-height:0;overflow:hidden;transition:max-height .28s ease}
 .collapse .inner{padding:2px 15px 15px}
 .formula{font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;line-height:2;overflow-x:auto;white-space:nowrap;color:var(--ink-dim)}
-.formula .v{color:var(--amber)} .formula .res{color:var(--green-soft)}
+.formula .v{color:var(--amber)} .formula .res{color:var(--stellar-lt)}
 .modenote{font-size:12.5px;color:var(--ink-dim);line-height:1.7}
 .modenote .on{color:var(--ink);background:var(--panel-3);border-radius:6px;padding:2px 7px;font-weight:500}
 .btn{background:var(--blue-bg,rgba(74,144,217,.14));border:1px solid var(--blue);color:var(--blue-soft);border-radius:8px;padding:8px 13px;font-size:11.5px;transition:.15s}
 .btn:hover{background:var(--blue);color:#08121f}
 .btn.amber{background:rgba(231,178,76,.1);border-color:var(--amber-dim);color:var(--amber)}
 .btn.amber:hover{background:var(--amber);color:#20160a}
+
+/* discovery mode */
+.discover{display:flex;flex-direction:column;gap:22px}
+.discover-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:20px;align-items:stretch}
+.lesson-copy{padding:4px 0 0}
+.lesson-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--amber);text-transform:uppercase;margin-bottom:8px}
+.lesson-copy h2{font-size:31px;line-height:1.12;letter-spacing:0;text-wrap:balance}
+.lesson-copy p{color:var(--ink-dim);font-size:15px;max-width:68ch;margin:12px 0 0}
+.lesson-copy p b{color:var(--ink)}
+.world-card{background:linear-gradient(180deg,rgba(79,194,160,.04),transparent),var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;box-shadow:var(--shadow)}
+.world-card .cap{font-size:11px;color:var(--ink-dim);margin-bottom:9px}
+.world-frame{overflow-x:auto}
+.lesson-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(280px,.95fr);gap:16px;align-items:start}
+.learning-band{background:transparent;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0}
+.lesson-panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:15px}
+.lesson-panel h3{font-size:16px;margin-bottom:7px;letter-spacing:0}
+.lesson-panel p{margin:0;color:var(--ink-dim)}
+.lesson-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.predict{border:1px solid var(--amber-dim);border-radius:8px;background:linear-gradient(130deg,rgba(231,178,76,.10),rgba(231,178,76,.025));padding:13px;margin-top:13px}
+.predict .pq{font-size:13px;color:var(--ink);font-weight:600}
+.predict .pchoices{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.predict button{background:var(--panel);border:1px solid var(--line-bright);color:var(--ink-dim);border-radius:7px;padding:7px 10px;font-size:11.5px}
+.predict button.on,.predict button:hover{border-color:var(--amber-dim);color:var(--ink);background:var(--panel-2)}
+.predict .preveal{font-size:12.5px;color:var(--ink-dim);margin-top:10px;line-height:1.55}
+.predict .preveal b{color:var(--amber-soft)}
+.scenario-grid{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px}
+.scenario-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:left;color:var(--ink);transition:.15s;min-height:178px;display:flex;flex-direction:column;gap:8px}
+.scenario-card:hover,.scenario-card.on{border-color:var(--amber-dim);background:var(--panel-2)}
+.scenario-card .st{font-size:12.5px;font-weight:700;color:var(--ink)}
+.scenario-card .schanges{font-family:var(--mono);font-size:10px;color:var(--amber);line-height:1.45}
+.scenario-card .sbody{font-size:11.5px;color:var(--ink-dim);line-height:1.45}
+.scenario-card .scatch{font-size:10.5px;color:var(--ink-faint);margin-top:auto}
+.scenario-card .scatch b{color:var(--blue-soft)}
+.question-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:13px 0}
+.question-band .qtitle{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px}
+.question-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qitem{background:rgba(132,169,255,.045);border:1px solid var(--line);border-radius:8px;padding:10px 11px;font-size:12px;line-height:1.45;color:var(--ink-dim)}
+.qitem b{color:var(--ink);font-weight:600}
+.discover-nav{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:18px}
+.discover-nav button{background:var(--panel);border:1px solid var(--line-bright);border-radius:8px;color:var(--ink);padding:10px 14px;font-size:12px}
+.discover-nav button:disabled{opacity:.35;cursor:default}
+.discover-nav .next{text-align:right;margin-left:auto}
+.fterm{color:var(--amber);border-bottom:1px dotted var(--amber-dim);cursor:help}
+[data-cohort]{transition:opacity .16s ease,filter .16s ease}
+body[data-focus-cohort="tp"] [data-cohort]:not([data-cohort="tp"]),
+body[data-focus-cohort="fp"] [data-cohort]:not([data-cohort="fp"]),
+body[data-focus-cohort="fn"] [data-cohort]:not([data-cohort="fn"]),
+body[data-focus-cohort="tn"] [data-cohort]:not([data-cohort="tn"]){opacity:.22;filter:saturate(.55)}
+body[data-focus-cohort="tp"] [data-cohort="tp"],
+body[data-focus-cohort="fp"] [data-cohort="fp"],
+body[data-focus-cohort="fn"] [data-cohort="fn"],
+body[data-focus-cohort="tn"] [data-cohort="tn"]{filter:drop-shadow(0 0 6px rgba(231,178,76,.34))}
+@media(max-width:980px){.discover-hero,.lesson-grid{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr 1fr}.question-list{grid-template-columns:1fr}.lesson-copy h2{font-size:26px}}
+@media(max-width:620px){.scenario-grid{grid-template-columns:1fr}.viewseg{order:5;width:100%}.viewseg button{flex:1}.lessonbar{padding-top:6px}}
 
 /* nav */
 .nav{display:flex;justify-content:space-between;gap:12px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}
@@ -209,7 +281,7 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
 .clabel .tipterm:hover{border-bottom-color:var(--amber)}
 #tip{position:fixed;z-index:400;max-width:300px;background:linear-gradient(165deg,var(--panel-3),var(--panel-2));border:1px solid var(--line-bright);border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.6;color:var(--ink);box-shadow:0 16px 40px -12px #000;display:none;pointer-events:none}
 #tip .th{font-family:var(--mono);font-size:12px;color:var(--amber);letter-spacing:.02em;margin-bottom:5px;display:block}
-#tip .up{color:var(--green-soft);font-weight:600} #tip .dn{color:var(--red-soft);font-weight:600}
+#tip .up{color:var(--stellar-lt);font-weight:600} #tip .dn{color:var(--red-soft);font-weight:600}
 #tip .arrow{font-weight:700}
 
 /* welcome overlay */
@@ -240,7 +312,7 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
 
 <!-- shared gradient defs -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="gdefs">
-  <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#84a9ff" stop-opacity=".5"/><stop offset="1" stop-color="#84a9ff" stop-opacity=".03"/></linearGradient>
+  <linearGradient id="gBenign" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#84a9ff" stop-opacity=".5"/><stop offset="1" stop-color="#84a9ff" stop-opacity=".03"/></linearGradient>
   <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ec6a4f" stop-opacity=".52"/><stop offset="1" stop-color="#ec6a4f" stop-opacity=".03"/></linearGradient>
   <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#84a9ff" stop-opacity=".3"/><stop offset="1" stop-color="#84a9ff" stop-opacity=".02"/></linearGradient>
   <radialGradient id="gPt"><stop offset="0" stop-color="#e7b24c" stop-opacity=".5"/><stop offset="1" stop-color="#e7b24c" stop-opacity="0"/></radialGradient>
@@ -248,8 +320,8 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
   <linearGradient id="gWeave" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4fc2a0"/><stop offset=".5" stop-color="#84a9ff"/><stop offset="1" stop-color="#e7b24c"/></linearGradient>
 </defs></svg>
 
-<div class="welcome" id="welcome">
-  <div class="wcard">
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-desc">
+  <div class="wcard" tabindex="-1">
     <div class="whero"><div id="wfield" class="wfield" aria-hidden="true"></div>
       <svg class="mark-lg" width="46" height="46" viewBox="0 0 30 30" aria-hidden="true">
         <path d="M8.5 26 C 6 21 10.6 19.6 11.8 17.4 C 13 14.8 13 10 15 6.4" fill="none" stroke="#84a9ff" stroke-width="2.1" stroke-linecap="round"/>
@@ -260,17 +332,18 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
       <div class="wmark">ASTRAL</div>
       <div class="wtag">Activity Scanner Tool for Risk Assessment of Logs</div>
     </div>
-    <h1>Find the signal in the noise.</h1>
-    <p>ASTRAL reads a sea of AI chat logs looking for the rare conversation that’s really about causing biological harm — and hands a human reviewer the few worth a closer look. <b>How well it does that</b> comes down to a handful of numbers. This is where you get to <em>feel</em> what they mean, no statistics required.</p>
-    <p>Everything here is <b>one living world</b> — a crowd of sessions you shape with a few dials. Nudge a dial and <b>every metric moves at once.</b> That’s the whole trick, and it’s kind of fun to watch.</p>
+    <h1 id="welcome-title">Guided Discovery: find the signal in the logs.</h1>
+    <p id="welcome-desc">ASTRAL reads a sea of AI-interaction logs for biological-misuse risk, reconstructs intent over time, and surfaces a prioritized, evidence-cited assessment for human review. <b>How well it does that</b> comes down to a handful of numbers you can learn by moving the system yourself.</p>
+    <p>Everything here is <b>one shared assessment world</b> — scattered behavior, one legible focus. Nudge a dial and <b>every metric moves at once.</b></p>
     <div class="wsteps">
-      <div class="wstep"><span class="num">1</span><span>Play with the <b>dials</b> up top — how rare the danger is, how sharp ASTRAL’s eye is, and where you draw the line.</span></div>
-      <div class="wstep"><span class="num">2</span><span>Wander the tabs <b>left → right</b>. Each one is a single idea, in plain words first — the math only appears if you ask for it.</span></div>
-      <div class="wstep"><span class="num">3</span><span>Chase the <b>▶ Try this</b> nudge on each tab and watch the whole system respond.</span></div>
+      <div class="wstep"><span class="num">1</span><span>Play with the <b>dials</b> up top — how rare the risky behavior is, how sharp ASTRAL’s assessment is, and where you draw the line.</span></div>
+      <div class="wstep"><span class="num">2</span><span>Follow <b>Discover</b> first. Each lesson asks for one move, then reveals the statistical tradeoff it exposes.</span></div>
+      <div class="wstep"><span class="num">3</span><span>Switch to <b>Reference</b> when you want the full KPI tab, formula, or operational caveat.</span></div>
     </div>
     <div class="wgo">
-      <button class="primary" onclick="closeWelcome()">Start exploring →</button>
-      <button class="secondary" onclick="closeWelcome(5)">Show me the surprising one</button>
+      <button class="primary" data-initial-focus onclick="closeWelcome()">Start Guided Discovery →</button>
+      <button class="secondary" onclick="closeWelcome('reference')">Open Reference tabs</button>
+      <button class="secondary" onclick="closeWelcome(5)">Show PR-AUC surprise</button>
     </div>
   </div>
 </div>
@@ -284,6 +357,10 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
       <circle cx="15" cy="6" r="3" fill="url(#gPt)"/><circle cx="15" cy="6" r="2.5" fill="#e7b24c"/>
     </svg>
     <div class="wordmark">ASTRAL<span class="sub">KPI Sandbox · learn the metrics by playing</span></div>
+    <div class="viewseg" role="tablist" aria-label="learning mode">
+      <button id="view-discover" role="tab" onclick="setViewMode('discover')">Discover</button>
+      <button id="view-reference" role="tab" onclick="setViewMode('reference')">Reference</button>
+    </div>
     <div class="spacer"></div>
     <div class="tag">DETECTION METRICS · <b>ONE SHARED WORLD</b></div>
     <button class="ghostbtn" id="themebtn" onclick="toggleTheme()" aria-label="toggle light or dark mode">☀ light</button>
@@ -292,10 +369,11 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
   </div>
   <div class="controls" id="controls"></div>
   <div class="scoreboard" id="health" title="How well ASTRAL is doing overall, and whether your last move helped or hurt."></div>
-  <div class="hint"><b>↑ These dials are shared by every tab.</b> Hover any dotted name (dials, or metrics like precision) to see what it means and what moving it does. Follow <b>Next →</b> at the bottom for a guided path.</div>
+  <div class="hint" id="hint"><b>↑ These dials are shared by every view.</b> Discover gives you the guided path; Reference keeps the full KPI tabs and math.</div>
+  <div class="lessonbar" id="lessonbar" role="tablist" aria-label="guided discovery lessons"></div>
   <div class="tabs" id="tabs" role="tablist"></div>
 </div>
-<div class="wrap"><div id="content" role="tabpanel"></div></div>
+<div class="wrap" id="wrap"><div id="content" role="tabpanel"></div></div>
 <div id="tip" role="tooltip"></div>
 
 <script>
@@ -310,12 +388,12 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
    ASTRAL identity: cool=calm/benign, warm=act/misuse, amber=the one signal, teal=brand only. */
 const C_DARK={bg:'#080b14',panel:'#0b1120',panel2:'#0f1728',panel3:'#15213a',line:'#1d2942',lineB:'#2b3c5e',
   ink:'#dce7ff',inkDim:'#93a4cc',inkFaint:'#5f6f96',amber:'#e7b24c',amberSoft:'#f2c877',
-  red:'#ec6a4f',redSoft:'#f28e78',green:'#84a9ff',greenSoft:'#c9d8ff',blue:'#84a9ff',violet:'#5b78e6',
+  red:'#ec6a4f',redSoft:'#f28e78',blue:'#84a9ff',violet:'#5b78e6',
   benign:'#84a9ff',misuse:'#ec6a4f',signal:'#e7b24c',stellar:'#84a9ff',stellarLt:'#c9d8ff',
   spindle:'#4fc2a0',filament:'#8fe6cc',indigo:'#3a5bd9',north:'#dce7ff'};
 const C_LIGHT={bg:'#eef2fb',panel:'#ffffff',panel2:'#f5f8ff',panel3:'#e8eefa',line:'#d6deef',lineB:'#c0cce4',
   ink:'#132241',inkDim:'#55658c',inkFaint:'#8fa0c0',amber:'#c98a12',amberSoft:'#d99f26',
-  red:'#d95632',redSoft:'#e0714f',green:'#4a6fd8',greenSoft:'#6f8fe6',blue:'#4a6fd8',violet:'#3f52c0',
+  red:'#d95632',redSoft:'#e0714f',blue:'#4a6fd8',violet:'#3f52c0',
   benign:'#4a6fd8',misuse:'#d95632',signal:'#c98a12',stellar:'#4a6fd8',stellarLt:'#8fa8ee',
   spindle:'#2e8e74',filament:'#3fa588',indigo:'#3a5bd9',north:'#132241'};
 let THEME='dark', C=C_DARK;
@@ -346,14 +424,24 @@ const pctp=x=>x==null?'—':(x*100).toFixed(2)+'%';
 
 /* ============================================================= *  STATE  * ============================================================= */
 const DEFAULTS={pi:0.01,sep:1.8,tau:0.60,k:50,beta:2,mode:'batch',preset:'baseline',pEvade:0,pDual:0,nAudit:500,seed:12345};
-let STATE=Object.assign({},DEFAULTS,{tab:0,open:{},auditRoll:null,ndcgOrder:null,ctM:null,chance:false});
+let STATE=Object.assign({},DEFAULTS,{tab:0,viewMode:'discover',lessonId:0,lessonStep:0,focusCohort:null,prediction:null,flashKeys:[],scenarioFlash:null,open:{},auditRoll:null,ndcgOrder:null,ndcgSig:null,ctM:null,chance:false});
 
 const PRESETS={
-  baseline:{label:'baseline',patch:{pi:0.01,sep:1.8,tau:0.60,k:50,pEvade:0,pDual:0}},
-  evasion:{label:'sophisticated evasion',patch:{pEvade:0.38,sep:1.8}},
-  dualuse:{label:'dual-use benign',patch:{pDual:0.14,tau:0.60}},
-  rare:{label:'rare-but-severe',patch:{pi:0.0003}},
-  overcap:{label:'over-capacity',patch:{k:12}}
+  baseline:{label:'baseline',patch:{pi:0.01,sep:1.8,tau:0.60,k:50,pEvade:0,pDual:0},
+    breaks:'The assessment is balanced enough to read the core tradeoffs without hiding the signal.',
+    catches:'all KPIs',changes:'π 1% · d′ 1.8 · τ .60 · k 50'},
+  evasion:{label:'sophisticated evasion',patch:{pEvade:0.38,sep:1.8},
+    breaks:'Hard actors pull their scores back into ordinary traffic; blended averages start lying.',
+    catches:'By actor tier',changes:'evasion +38%'},
+  dualuse:{label:'dual-use benign',patch:{pDual:0.14,tau:0.60},
+    breaks:'Legitimate science looks suspicious, so the queue fills with plausible false alarms.',
+    catches:'precision + FPR',changes:'dual-use benign +14%'},
+  rare:{label:'rare-but-severe',patch:{pi:0.0003},
+    breaks:'The risk is real but vanishingly rare; base-rate math makes precision fragile.',
+    catches:'PR-AUC + precision',changes:'π .03%'},
+  overcap:{label:'over-capacity',patch:{k:12},
+    breaks:'The detector can flag more than humans can inspect, so ranking becomes the product.',
+    catches:'NDCG@k + precision@k',changes:'k 12'}
 };
 
 /* ============================================================= *  Discrete pool  * ============================================================= */
@@ -428,15 +516,22 @@ function ticks(sc,xs,ys){let s='';const {W,H,m}=sc;
 
 /* ============================================================= *  Actions  * ============================================================= */
 const SLIDERS={}, CELLS={};
+function resetRankingIfNeeded(key){if(['pi','sep','tau','k','pEvade','pDual','preset'].includes(key)){STATE.ndcgOrder=null;STATE.ndcgSig=null;}}
 function onLever(key,raw){let v=parseFloat(raw);if(key==='pi')v=Math.pow(10,v);
-  if(key==='k'||key==='nAudit')v=Math.round(v);STATE[key]=v;STATE.auditRoll=null;STATE.lastLever=key;noteOutcome();renderLite();}
-function setTab(i){STATE.tab=clamp(i,0,TABS.length-1);render();window.scrollTo({top:0,behavior:'smooth'});}
+  if(key==='k'||key==='nAudit')v=Math.round(v);STATE[key]=v;STATE.auditRoll=null;STATE.lastLever=key;resetRankingIfNeeded(key);noteOutcome();renderLite();}
+function setViewMode(m){STATE.viewMode=(m==='reference')?'reference':'discover';render();window.scrollTo({top:0,behavior:'smooth'});}
+function setLesson(i){STATE.viewMode='discover';STATE.lessonId=clamp(i,0,DISCOVERY_LESSONS.length-1);STATE.prediction=null;render();window.scrollTo({top:0,behavior:'smooth'});}
+function setTab(i){STATE.viewMode='reference';STATE.tab=clamp(i,0,TABS.length-1);render();window.scrollTo({top:0,behavior:'smooth'});}
 function toggleOpen(id){STATE.open[id]=!STATE.open[id];renderContent();}
 function setMode(m){STATE.mode=m;noteOutcome();render();}
-function resetLevers(){Object.assign(STATE,{pi:.01,sep:1.8,tau:.6,k:50,beta:2,pEvade:0,pDual:0,preset:'baseline',nAudit:500,auditRoll:null});noteOutcome();render();}
+function resetLevers(){Object.assign(STATE,{pi:.01,sep:1.8,tau:.6,k:50,beta:2,pEvade:0,pDual:0,preset:'baseline',nAudit:500,auditRoll:null,ndcgOrder:null,ndcgSig:null,prediction:null,scenarioFlash:null,flashKeys:[]});noteOutcome();render();}
 function applyPreset(name){const p=PRESETS[name];if(!p)return;
-  Object.assign(STATE,{pEvade:0,pDual:0},p.patch,{preset:name,auditRoll:null});noteOutcome();render();}
-function setSlider(key,val){STATE[key]=val;STATE.lastLever=key;noteOutcome();render();}
+  STATE.flashKeys=Object.keys(p.patch);STATE.scenarioFlash=name;
+  Object.assign(STATE,{pEvade:0,pDual:0},p.patch,{preset:name,auditRoll:null,ndcgOrder:null,ndcgSig:null});noteOutcome();render();
+  window.setTimeout(()=>{STATE.flashKeys=[];patchControls();},950);}
+function setSlider(key,val){STATE[key]=val;STATE.lastLever=key;resetRankingIfNeeded(key);noteOutcome();render();}
+function setPrediction(id,choice){STATE.prediction={id,choice};renderContent();}
+function setFocus(c){STATE.focusCohort=c||null;document.body.setAttribute('data-focus-cohort',STATE.focusCohort||'');}
 function rollAudit(){const D=deriveState(STATE);if(!D.unflagged.length){STATE.auditRoll=null;renderContent();return;}
   const seed=(STATE.auditRoll?STATE.auditRoll.seed+1:1);const rng=mulberry32((STATE.seed*7+seed)|0);
   const n=Math.min(STATE.nAudit,D.unflagged.length);const pool=D.unflagged.slice();let found=0;
@@ -445,8 +540,23 @@ function rollAudit(){const D=deriveState(STATE);if(!D.unflagged.length){STATE.au
 function reorderNdcg(i,dir){if(!STATE.ndcgOrder)return;const o=STATE.ndcgOrder,j=i+dir;
   if(j<0||j>=o.length)return;[o[i],o[j]]=[o[j],o[i]];renderContent();}
 function ctCell(i,j,d){if(!STATE.ctM)STATE.ctM=ctMatrixDefault();STATE.ctM[i][j]=Math.max(0,STATE.ctM[i][j]+d*5);renderContent();}
-function closeWelcome(tab){document.getElementById('welcome').classList.add('hide');if(tab!=null)setTab(tab);}
-function openWelcome(){document.getElementById('welcome').classList.remove('hide');}
+function focusables(root){return Array.from(root.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')).filter(el=>!el.disabled&&el.offsetParent!==null);}
+function setAppInert(on){['.chrome','#wrap'].forEach(sel=>{const el=document.querySelector(sel);if(!el)return;el.inert=!!on;el.setAttribute('aria-hidden',on?'true':'false');});}
+function showWelcome(on){const w=document.getElementById('welcome');if(!w)return;
+  w.classList.toggle('hide',!on);setAppInert(on);
+  if(on)window.setTimeout(()=>{(w.querySelector('[data-initial-focus]')||w.querySelector('.wcard')).focus();},0);}
+function closeWelcome(target){showWelcome(false);
+  if(target==='reference')setViewMode('reference');
+  else if(target!=null)setTab(target);
+  else setViewMode('discover');}
+function openWelcome(){showWelcome(true);}
+document.addEventListener('keydown',e=>{const w=document.getElementById('welcome');if(!w||w.classList.contains('hide'))return;
+  if(e.key==='Escape'){e.preventDefault();showWelcome(false);return;}
+  if(e.key!=='Tab')return;
+  const f=focusables(w);if(!f.length)return;
+  const first=f[0],last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
 
 /* ============================================================= *  Shell (built once)  * ============================================================= */
 function buildControls(){
@@ -478,11 +588,18 @@ function patchControls(){
   set('val-sep',STATE.sep.toFixed(2));set('val-tau',STATE.tau.toFixed(3));
   set('val-k',fmtInt(STATE.k));set('sub-k',STATE.k+' sessions / shift');
   set('val-beta',STATE.beta.toFixed(1));
-  const spot=new Set(TABS[STATE.tab].spotlight||[]);
-  Object.keys(CELLS).forEach(k=>CELLS[k].classList.toggle('spot',spot.has(k)));
+  const spot=new Set(activeSpotlight());
+  Object.keys(CELLS).forEach(k=>{
+    CELLS[k].classList.toggle('spot',spot.has(k));
+    CELLS[k].classList.toggle('flash',(STATE.flashKeys||[]).includes(k));
+  });
   const seg=document.getElementById('modeseg').children;
   seg[0].classList.toggle('on',STATE.mode==='batch');seg[1].classList.toggle('on',STATE.mode==='operational');
   patchHealth();
+}
+function activeSpotlight(){
+  if(STATE.viewMode==='discover')return (DISCOVERY_LESSONS[STATE.lessonId]||{}).spotlight||[];
+  return (TABS[STATE.tab]||{}).spotlight||[];
 }
 /* north-star outcome signal — F2 is the single "is ASTRAL doing its job" score (recall weighted 4x) */
 function noteOutcome(){const D=deriveState(STATE);
@@ -494,11 +611,11 @@ function noteOutcome(){const D=deriveState(STATE);
 /* "why did that happen?" — surface a plain-language note whenever the result defies a beginner's naive expectation */
 function whyNote(){
   const fd=STATE.f2Delta||0,rd=STATE.rDelta||0,eps=8e-4,L=STATE.lastLever;
-  if(L==='beta'&&Math.abs(fd)>eps) return {t:'F2 moved — but ASTRAL didn’t get better or worse',b:'β changes the <em>ruler</em>, not the detector. You re-weighted how much a missed threat counts vs. a false alarm; the underlying precision and recall are unchanged.'};
-  if(L==='k'&&Math.abs(fd)<=eps) return {t:'Capacity didn’t move the north-star',b:'F2 is about the detector’s overall precision and recall, which don’t depend on how many sessions a reviewer can open. Capacity <b>k</b> shows up in <b>precision@k</b>, <b>NDCG@k</b>, and alert fatigue instead.'};
+  if(L==='beta'&&Math.abs(fd)>eps) return {t:'F2 moved — but ASTRAL didn’t get better or worse',b:'β changes the <em>ruler</em>, not the detector. You re-weighted how much a missed misuse case counts vs. a false alarm; the underlying precision and recall are unchanged.'};
+  if(L==='k'&&Math.abs(fd)<=eps) return {t:'Capacity didn’t move the north-star',b:'F2 is about the detector’s overall precision and recall, which don’t depend on how many sessions a reviewer can open. Capacity <b>k</b> shows up in <b>precision@k</b>, <b>NDCG@k</b>, and review load instead.'};
   if(L==='pi'&&Math.abs(fd)>eps) return {t:'The world changed — not the detector',b:`You changed how <em>rare</em> misuse is. ASTRAL is identical, but rarer misuse means more false alarms per real catch, so the same detector looks ${fd<0?'worse':'better'}. That gap is the <b>base-rate effect</b>.`};
   if(rd<-eps&&fd>eps) return {t:'You’re missing more — yet the score went up?',b:'Flagging fewer sessions means more real misuse slips by (recall ↓). But at this rare base rate the queue is mostly false alarms, so <b>precision is the bottleneck</b> — trimming flags lifted it more than the extra misses cost you. Keep sliding and F2 eventually falls as recall gets too small.'};
-  if(rd>eps&&fd<-eps) return {t:'You’re catching more — yet the score dropped?',b:'You caught more real misuse (recall ↑), but at a rare base rate, flagging more <b>floods the queue with false alarms</b> faster than it adds real catches — so precision craters and F2 falls.'};
+  if(rd>eps&&fd<-eps) return {t:'You’re catching more — yet the score dropped?',b:'You caught more real misuse (recall ↑), but at a rare base rate, flagging more <b>fills the queue with false alarms</b> faster than it adds real catches — so precision falls sharply and F2 falls.'};
   return null;}
 function whyBanner(){if(STATE.whyOff)return '';const w=whyNote();if(!w)return '';
   return `<div class="whybox"><button class="whyx" onclick="STATE.whyOff=true;renderContent()" aria-label="dismiss">×</button><span class="whyi">💡 why did that happen?</span><div class="whyt"><b>${w.t}</b> ${w.b}</div></div>`;}
@@ -507,10 +624,10 @@ function healthBar(){
   const dir=Math.abs(d)<5e-4?{c:'steady',a:'•',w:'holding steady'}:d>0?{c:'up',a:'▲',w:'better'}:{c:'down',a:'▼',w:'worse'};
   // name the actual weak link, not just the level: low F2 can be a noisy queue (low precision) OR real misses (low recall)
   let note;
-  if(f2>=0.6) note='strong — catching threats cleanly';
+  if(f2>=0.6) note='strong — surfacing misuse cleanly';
   else if(P==null||R==null) note='—';
   else if(R-P>0.2) note='noisy — queue is mostly false alarms';
-  else if(P-R>0.2) note='missing — real threats slipping past';
+  else if(P-R>0.2) note='missing — real misuse passing through';
   else if(f2>=0.35) note='decent — room to improve';
   else note='weak — false alarms and misses both';
   return `<span class="sb-key tipterm" data-tip="northstar">◆ NORTH-STAR</span>`+
@@ -522,7 +639,7 @@ function healthBar(){
 function patchHealth(){const el=document.getElementById('health');if(el)el.innerHTML=healthBar();}
 /* theme (dark / light) — CSS vars switch via [data-theme]; SVG colors switch via the C palette + regenerated gradients */
 function defsHTML(){const L=THEME==='light';return `
-  <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.benign}" stop-opacity="${L?.34:.5}"/><stop offset="1" stop-color="${C.benign}" stop-opacity=".03"/></linearGradient>
+  <linearGradient id="gBenign" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.benign}" stop-opacity="${L?.34:.5}"/><stop offset="1" stop-color="${C.benign}" stop-opacity=".03"/></linearGradient>
   <linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.misuse}" stop-opacity="${L?.36:.52}"/><stop offset="1" stop-color="${C.misuse}" stop-opacity=".03"/></linearGradient>
   <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${C.stellar}" stop-opacity="${L?.22:.3}"/><stop offset="1" stop-color="${C.stellar}" stop-opacity=".02"/></linearGradient>
   <radialGradient id="gPt"><stop offset="0" stop-color="${C.signal}" stop-opacity=".5"/><stop offset="1" stop-color="${C.signal}" stop-opacity="0"/></radialGradient>
@@ -535,15 +652,38 @@ function setTheme(t){THEME=(t==='light')?'light':'dark';C=(THEME==='light')?C_LI
   const b=document.getElementById('themebtn');if(b)b.textContent=(THEME==='light'?'☾ dark':'☀ light');
   paintDefs();render();paintMotif();}
 function toggleTheme(){setTheme(THEME==='light'?'dark':'light');}
-function renderTabs(){document.getElementById('tabs').innerHTML=TABS.map((t,i)=>
-  `<button role="tab" aria-selected="${i===STATE.tab}" class="${i===STATE.tab?'on':''}" onclick="setTab(${i})"><span class="n">${i}</span>${t.short}</button>`).join('');}
+function patchViewShell(){
+  const discover=STATE.viewMode==='discover';
+  const wrap=document.getElementById('wrap'),hint=document.getElementById('hint');
+  document.getElementById('view-discover').classList.toggle('on',discover);
+  document.getElementById('view-reference').classList.toggle('on',!discover);
+  document.getElementById('view-discover').setAttribute('aria-selected',discover);
+  document.getElementById('view-reference').setAttribute('aria-selected',!discover);
+  wrap.classList.toggle('discover-wrap',discover);
+  hint.innerHTML=discover?
+    '<b>↑ These dials shape the same ASTRAL assessment world.</b> Follow the lesson bar, make one move, and watch the signal converge into a review priority.':
+    '<b>↑ These dials are shared by every Reference tab.</b> Hover dotted names for definitions; formulas stay tucked away until you ask for them.';
+}
+function renderLessonBar(){
+  const el=document.getElementById('lessonbar'),discover=STATE.viewMode==='discover';
+  el.classList.toggle('hide',!discover);
+  el.innerHTML=discover?DISCOVERY_LESSONS.map((l,i)=>
+    `<button role="tab" aria-label="${String(i+1).padStart(2,'0')} ${l.short}" aria-selected="${i===STATE.lessonId}" class="${i===STATE.lessonId?'on':''}" onclick="setLesson(${i})"><span class="n">${String(i+1).padStart(2,'0')}</span> ${l.short}</button>`).join(''):'';
+}
+function renderTabs(){
+  const el=document.getElementById('tabs'),ref=STATE.viewMode==='reference';
+  el.classList.toggle('hide',!ref);
+  el.innerHTML=ref?TABS.map((t,i)=>
+  `<button role="tab" aria-label="${i} ${t.short}" aria-selected="${i===STATE.tab}" class="${i===STATE.tab?'on':''}" onclick="setTab(${i})"><span class="n">${i}</span> ${t.short}</button>`).join(''):'';
+}
 
 /* render entrypoints */
-function render(){syncSliders();patchControls();renderTabs();renderContent();}   // full (tab/preset/mode/drag)
+function render(){syncSliders();patchViewShell();patchControls();renderLessonBar();renderTabs();renderContent();}   // full (tab/preset/mode/drag)
 function renderLite(){patchControls();renderContent();}                          // slider drag (don't touch sliders)
 function renderContent(){
-  const D=deriveState(STATE),t=TABS[STATE.tab];
-  document.getElementById('content').innerHTML=whyBanner()+tabHead(t)+guideBox(t)+t.render(D)+navBox(STATE.tab);
+  const D=deriveState(STATE),isDiscover=STATE.viewMode==='discover',t=TABS[STATE.tab];
+  document.getElementById('content').innerHTML=whyBanner()+(isDiscover?renderDiscover(D):(tabHead(t)+guideBox(t)+t.render(D)+navBox(STATE.tab)));
+  setFocus(STATE.focusCohort);
   wireDrag();
   document.querySelectorAll('.collapse.open .body').forEach(b=>b.style.maxHeight=b.scrollHeight+40+'px');
 }
@@ -559,16 +699,25 @@ function navBox(i){const prev=TABS[i-1],next=TABS[i+1];
 function collapse(id,title,inner){const open=!!STATE.open[id];
   return `<div class="collapse${open?' open':''}"><button aria-expanded="${open}" onclick="toggleOpen('${id}')"><span class="caret">▸</span>${title}</button>
     <div class="body" style="max-height:${open?'2400px':'0'}"><div class="inner">${inner}</div></div></div>`;}
-function collapseMath(id,html,extra){return `<div class="sec">${collapse('m'+id,'Under the hood — for the curious',`${extra||''}<div class="formula">${html}</div>`)}</div>`;}
+function formulaTerm(t){const c=t.toLowerCase();return `<span class="fterm" ${cohortAttrs(c,true)}>${t}</span>`;}
+function annotateFormula(html){return html.replace(/\b(TP|FP|FN|TN)\b/g,m=>formulaTerm(m));}
+function collapseMath(id,html,extra){return `<div class="sec">${collapse('m'+id,'Under the hood — for the curious',`${extra||''}<div class="formula">${annotateFormula(html)}</div>`)}</div>`;}
 function modeNote(batch,oper){const b=STATE.mode==='batch';
   return `<div class="sec"><div class="lbl">Batch vs Operational</div><div class="card modenote">
     <div style="margin-bottom:8px">${b?'<span class="on">▸ Batch (active)</span>':'<b>Batch</b>'} — ${batch}</div>
     <div>${!b?'<span class="on">▸ Operational (active)</span>':'<b>Operational</b>'} — ${oper}</div></div></div>`;}
 function breaks(id,text,preset){return `<div class="sec">${collapse('b'+id,'What breaks it — failure mode',
   text+`<div style="margin-top:11px"><button class="btn amber" onclick="applyPreset('${preset}')">▸ Show me — load «${PRESETS[preset].label}»</button></div>`)}</div>`;}
-function chip(cls,big,lab,sub){const tk=tipKeyFor(lab);
+function cohortForLabel(lab){const l=(lab||'').toLowerCase();
+  if(l.includes('caught')||l.includes('(tp)'))return 'tp';
+  if(l.includes('missed')||l.includes('(fn)'))return 'fn';
+  if(l.includes('false alarm')||l.includes('researchers flagged'))return 'fp';
+  if(l.includes('left alone'))return 'tn';
+  return null;}
+function cohortAttrs(c,keyboard){return c?`data-cohort="${c}" onmouseenter="setFocus('${c}')" onmouseleave="setFocus(null)"${keyboard?` onfocus="setFocus('${c}')" onblur="setFocus(null)" tabindex="0"`:''}`:'';}
+function chip(cls,big,lab,sub){const tk=tipKeyFor(lab),co=cohortForLabel(lab);
   const labHtml=tk?`<span class="tipterm" data-tip="${tk}" tabindex="0">${lab}</span>`:lab;
-  return `<div class="chip ${cls||''}"><div class="big tnum">${big}</div><div class="lab">${labHtml}</div>${sub?`<div class="sublab">${sub}</div>`:''}</div>`;}
+  return `<div class="chip ${cls||''}" ${cohortAttrs(co,true)}><div class="big tnum">${big}</div><div class="lab">${labHtml}</div>${sub?`<div class="sublab">${sub}</div>`:''}</div>`;}
 function legend(items){return `<div class="legend">${items.map(it=>`<span class="k"><span class="sw ${it.ring?'ring':''}" style="${it.ring?'':'background:'+it.c}"></span>${it.t}</span>`).join('')}</div>`;}
 
 /* ============================================================= *  VISUALS  * ============================================================= */
@@ -588,8 +737,8 @@ function drawHist(D){
   const Xt=sx(STATE.tau);let s='';
   s+=grid(sc,[.25,.5,.75],[]);
   s+=`<rect x="${Xt}" y="${m.t}" width="${W-m.r-Xt}" height="${H-m.t-m.b}" fill="${C.amber}" opacity="0.05"/>`;
-  s+=`<path d="${area(ben)}" fill="url(#gGreen)"/><path d="${area(mis)}" fill="url(#gRed)"/>`;
-  s+=`<path d="${pathFrom(ben,sx,sy)}" fill="none" stroke="${C.green}" stroke-width="1.6"/>`;
+  s+=`<path d="${area(ben)}" fill="url(#gBenign)"/><path d="${area(mis)}" fill="url(#gRed)"/>`;
+  s+=`<path d="${pathFrom(ben,sx,sy)}" fill="none" stroke="${C.stellar}" stroke-width="1.6"/>`;
   s+=`<path d="${pathFrom(mis,sx,sy)}" fill="none" stroke="${C.red}" stroke-width="1.6"/>`;
   // region labels (top, out of the way)
   s+=`<text x="${m.l+4}" y="${m.t-16}" fill="${C.inkFaint}" font-size="10.5">← left alone</text>`;
@@ -614,22 +763,22 @@ function drawConfusion(D){
   s+=`<text x="${gx-10}" y="${gy+ch+gap/2}" fill="${C.inkDim}" font-size="10" text-anchor="middle" transform="rotate(-90 ${gx-10} ${gy+ch+gap/2})">truth →</text>`;
   s+=`<text x="${gx+cw/2}" y="${gy-9}" fill="${C.inkFaint}" font-size="9" text-anchor="middle">flagged</text>`;
   s+=`<text x="${gx+cw+gap+cw/2}" y="${gy-9}" fill="${C.inkFaint}" font-size="9" text-anchor="middle">not flagged</text>`;
-  cells.forEach((cl,idx)=>{const r=idx>>1,c=idx&1,x=gx+c*(cw+gap),y=gy+r*(ch+gap);
+  cells.forEach((cl,idx)=>{const r=idx>>1,c=idx&1,x=gx+c*(cw+gap),y=gy+r*(ch+gap),co=cl[0].toLowerCase();
     const hide=STATE.mode==='operational'&&cl[0]==='FN';
     const frac=cl[1]/tot,op=hide?0.05:clamp(0.1+0.6*Math.sqrt(frac),0.08,0.55);
-    s+=`<rect x="${x}" y="${y}" width="${cw}" height="${ch}" rx="9" fill="${cl[2]}" opacity="${op}"
+    s+=`<g ${cohortAttrs(co)}><rect x="${x}" y="${y}" width="${cw}" height="${ch}" rx="9" fill="${cl[2]}" opacity="${op}"
         stroke="${cl[3]?C.amber:C.line}" stroke-width="${cl[3]?1.6:1}" ${hide?'stroke-dasharray="4 3"':''}/>`;
     s+=`<text x="${x+12}" y="${y+21}" fill="${C.ink}" font-size="12" font-weight="700">${cl[0]}</text>`;
     s+=`<text x="${x+cw-10}" y="${y+21}" fill="${C.inkDim}" font-size="9" text-anchor="end">${cl[4]}</text>`;
-    s+=`<text x="${x+12}" y="${y+53}" fill="${hide?C.inkFaint:C.ink}" font-size="18" font-weight="600" font-family="${C.mono||'monospace'}">${hide?'??':fmtInt(cl[1])}</text>`;});
+    s+=`<text x="${x+12}" y="${y+53}" fill="${hide?C.inkFaint:C.ink}" font-size="18" font-weight="600" font-family="${C.mono||'monospace'}">${hide?'??':fmtInt(cl[1])}</text></g>`;});
   return svgEl(W,H,s,'conf');
 }
 function drawQueue(D){
   const cols=25,cell=15,gap=3,SHOW=100;const list=D.flagged.slice(0,SHOW),total=list.length;
   if(!total)return svgEl(400,50,`<text x="8" y="30" fill="${C.inkDim}" font-size="12">Nothing is flagged at τ = ${STATE.tau.toFixed(2)}. Slide τ down to fill the queue.</text>`,'queue');
   const rows=Math.ceil(total/cols),W=cols*(cell+gap)+2,H=rows*(cell+gap)+8;let s='';
-  list.forEach((it,i)=>{const x=1+(i%cols)*(cell+gap),y=1+Math.floor(i/cols)*(cell+gap);
-    s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${it.isMis?C.misuse:C.benign}" opacity="0.9" stroke="${C.amber}" stroke-width="0.9"/>`;});
+  list.forEach((it,i)=>{const x=1+(i%cols)*(cell+gap),y=1+Math.floor(i/cols)*(cell+gap),co=it.isMis?'tp':'fp';
+    s+=`<rect ${cohortAttrs(co)} x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${it.isMis?C.misuse:C.benign}" opacity="0.9" stroke="${C.amber}" stroke-width="0.9"/>`;});
   const kIdx=Math.min(STATE.k,total),kr=Math.floor(kIdx/cols),ly=1+kr*(cell+gap)-1.5;
   if(STATE.k<=total){s+=`<line x1="1" y1="${ly}" x2="${W-1}" y2="${ly}" stroke="${C.amber}" stroke-width="2" stroke-dasharray="6 3"/>`;
     s+=`<rect x="${W-96}" y="${ly-16}" width="94" height="13" rx="3" fill="${C.bg}" opacity="0.8"/><text x="${W-4}" y="${ly-6}" fill="${C.amber}" font-size="9.5" text-anchor="end">▲ top ${STATE.k} reviewed</text>`;}
@@ -647,7 +796,7 @@ function drawFpr(D){
 function gauge(D){
   const ratio=(D.TP+D.FP)/Math.max(1,STATE.k),val=clamp(ratio/12,0,1);
   const W=220,H=132,cx=110,cy=112,rr=84,a0=Math.PI,a1=0,ang=a0+(a1-a0)*val;
-  const col=val<0.4?C.green:val<0.72?C.amber:C.red;
+  const col=val<0.4?C.stellar:val<0.72?C.amber:C.red;
   const arc=t=>{const a=a0+(a1-a0)*t;return[cx+rr*Math.cos(a),cy-rr*Math.sin(a)];};const[ex,ey]=arc(val);let s='';
   s+=`<path d="M ${cx-rr} ${cy} A ${rr} ${rr} 0 0 1 ${cx+rr} ${cy}" fill="none" stroke="${C.line}" stroke-width="12" stroke-linecap="round"/>`;
   if(val>0.012)s+=`<path d="M ${cx-rr} ${cy} A ${rr} ${rr} 0 0 1 ${ex} ${ey}" fill="none" stroke="${col}" stroke-width="12"/>`;
@@ -661,8 +810,8 @@ function drawRecall(D){
   const mis=D.sess.filter(s=>s.isMis).sort((a,b)=>b.score-a.score);const budget=Math.min(mis.length,100);
   const cols=20,cell=15,gap=3,rows=Math.ceil(budget/cols),W=cols*(cell+gap)+2,H=rows*(cell+gap)+2;let s='';
   mis.slice(0,budget).forEach((it,i)=>{const x=1+(i%cols)*(cell+gap),y=1+Math.floor(i/cols)*(cell+gap);
-    const caught=it.score>=STATE.tau,hide=STATE.mode==='operational'&&!caught;
-    s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${C.red}" opacity="${hide?0.1:0.9}" stroke="${caught?C.amber:C.inkFaint}" stroke-width="1" ${caught?'':'stroke-dasharray="2.5 2"'}/>`;
+    const caught=it.score>=STATE.tau,hide=STATE.mode==='operational'&&!caught,co=caught?'tp':'fn';
+    s+=`<rect ${cohortAttrs(co)} x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${C.red}" opacity="${hide?0.1:0.9}" stroke="${caught?C.amber:C.inkFaint}" stroke-width="1" ${caught?'':'stroke-dasharray="2.5 2"'}/>`;
     if(caught)s+=`<text x="${x+cell/2}" y="${y+cell-3.5}" fill="#1a0d09" font-size="10" text-anchor="middle" style="pointer-events:none">✓</text>`;});
   return svgEl(W,H,s,'recall');
 }
@@ -745,13 +894,16 @@ function drawTiers(D){const td=tierData(D),rows=td.rows;
 const NDCG_SHOW=12;
 function ndcgN(D){return Math.min(D.top.length,NDCG_SHOW);}
 function ndcgInit(D){return D.top.slice(0,ndcgN(D)).map(s=>({sev:s.isMis?s.sev:0,mis:s.isMis}));}
+function ndcgSignature(D){return D.top.slice(0,ndcgN(D)).map(s=>(s.isMis?1:0)+':'+s.sev+':'+s.score.toFixed(4)).join('|')+'|k'+STATE.k;}
+function ensureNdcgOrder(D){const sig=ndcgSignature(D);
+  if(!STATE.ndcgOrder||STATE.ndcgSig!==sig){STATE.ndcgOrder=ndcgInit(D);STATE.ndcgSig=sig;}
+  return STATE.ndcgOrder;}
 function drawNdcg(D){
-  if(!STATE.ndcgOrder||STATE.ndcgOrder.length!==ndcgN(D))STATE.ndcgOrder=ndcgInit(D);
-  const o=STATE.ndcgOrder,rowH=26,W=540,H=o.length*rowH+6;
+  const o=ensureNdcgOrder(D),rowH=26,W=540,H=o.length*rowH+6;
   const dcg=o.reduce((a,x,i)=>a+x.sev/Math.log2(i+2),0);
   const ideal=o.map(x=>x.sev).sort((a,b)=>b-a);const idcg=ideal.reduce((a,r,i)=>a+r/Math.log2(i+2),0);
   STATE._ndcgLive=safeDiv(dcg,idcg);
-  const col=v=>v===3?C.red:v===2?C.amber:v===1?C.green:C.inkFaint,lab=v=>v===3?'HIGH':v===2?'MED':v===1?'LOW':'benign';let s='';
+  const col=v=>v===3?C.red:v===2?C.amber:v===1?C.stellar:C.inkFaint,lab=v=>v===3?'P5':v===2?'P4':v===1?'P3':'benign';let s='';
   o.forEach((x,i)=>{const y=3+i*rowH,disc=1/Math.log2(i+2);
     s+=`<rect x="0" y="${y}" width="${W}" height="${rowH-4}" rx="5" fill="${C.panel2}" stroke="${C.line}"/>`;
     s+=`<text x="12" y="${y+16}" fill="${C.violet}" font-size="11" font-weight="600">#${i+1}</text>`;
@@ -760,11 +912,12 @@ function drawNdcg(D){
     s+=`<text x="74" y="${y+16}" fill="${C.ink}" font-size="11.5">${x.mis?'misuse':'benign'} · <tspan fill="${col(x.sev)}">${lab(x.sev)}</tspan></text>`;
     s+=`<text x="248" y="${y+16}" fill="${C.inkFaint}" font-size="10">gain ${x.sev} × ${disc.toFixed(2)} = ${(x.sev*disc).toFixed(2)}</text>`;
     s+=`<rect x="388" y="${y+6}" width="${(x.sev*disc)/3*120}" height="${rowH-16}" rx="2" fill="${col(x.sev)}" opacity="0.55"/>`;
-    s+=`<text x="${W-38}" y="${y+17}" fill="${i===0?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" onclick="reorderNdcg(${i},-1)">▲</text>`;
-    s+=`<text x="${W-18}" y="${y+17}" fill="${i===o.length-1?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" onclick="reorderNdcg(${i},1)">▼</text>`;});
+    s+=`<text x="${W-38}" y="${y+17}" fill="${i===0?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" role="button" tabindex="0" aria-label="Move rank ${i+1} up" onclick="reorderNdcg(${i},-1)" onkeydown="keyReorder(event,${i},-1)">▲</text>`;
+    s+=`<text x="${W-18}" y="${y+17}" fill="${i===o.length-1?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" role="button" tabindex="0" aria-label="Move rank ${i+1} down" onclick="reorderNdcg(${i},1)" onkeydown="keyReorder(event,${i},1)">▼</text>`;});
   return svgEl(W,H,s,'ndcg');
 }
-function loadStateActor(){const D=deriveState(STATE);STATE.ndcgOrder=ndcgInit(D);const o=STATE.ndcgOrder;
+function keyReorder(e,i,dir){if(e.key==='Enter'||e.key===' '){e.preventDefault();reorderNdcg(i,dir);}}
+function loadStateActor(){const D=deriveState(STATE);STATE.ndcgOrder=ndcgInit(D);STATE.ndcgSig=ndcgSignature(D);const o=STATE.ndcgOrder;
   const hi=o.findIndex(x=>x.sev===3);if(hi>=0){const it=o.splice(hi,1)[0];o.splice(Math.min(7,o.length),0,it);}renderContent();}
 function ctMatrixDefault(){return[[20,5,0,0],[4,18,3,0],[0,5,17,3],[0,0,6,19]];}
 function ctChanceDemo(){return[[85,0,0,0],[10,2,0,0],[3,0,0,0],[0,0,0,0]];}
@@ -781,7 +934,7 @@ function drawCT(M){const k=4,cell=62,gap=5,ox=52,oy=38,W=ox+k*(cell+gap)+8,H=oy+
   for(let j=0;j<k;j++)s+=`<text x="${ox+j*(cell+gap)+cell/2}" y="${oy-7}" fill="${C.inkFaint}" font-size="10" text-anchor="middle">CT${j+1}</text>`;
   for(let i=0;i<k;i++)s+=`<text x="${ox-8}" y="${oy+i*(cell+gap)+cell/2+4}" fill="${C.inkFaint}" font-size="10" text-anchor="end">CT${i+1}</text>`;
   for(let i=0;i<k;i++)for(let j=0;j<k;j++){const x=ox+j*(cell+gap),y=oy+i*(cell+gap),pen=1-w(i,j);
-    s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="7" fill="${i===j?C.green:C.red}" opacity="${i===j?0.24:0.08+0.44*pen}" stroke="${i===j?C.green:C.line}" stroke-width="1" style="cursor:pointer" onclick="ctCell(${i},${j},1)" oncontextmenu="ctCell(${i},${j},-1);return false"/>`;
+    s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="7" fill="${i===j?C.stellar:C.red}" opacity="${i===j?0.24:0.08+0.44*pen}" stroke="${i===j?C.stellar:C.line}" stroke-width="1" style="cursor:pointer" onclick="ctCell(${i},${j},1)" oncontextmenu="ctCell(${i},${j},-1);return false"/>`;
     s+=`<text x="${x+cell/2}" y="${y+cell/2+3}" fill="${C.ink}" font-size="16" text-anchor="middle" style="pointer-events:none">${M[i][j]}</text>`;
     if(i!==j&&pen>0)s+=`<text x="${x+cell/2}" y="${y+cell-6}" fill="${C.inkFaint}" font-size="7.5" text-anchor="middle" style="pointer-events:none">−${pen.toFixed(2)}</text>`;}
   return svgEl(W,H,s,'ct');
@@ -822,22 +975,145 @@ function drawAuditBand(D){const a=D.audit;if(!a)return'';const W=520,H=64,m={l:3
   s+=`<line x1="${sx(0)}" y1="38" x2="${sx(1)}" y2="38" stroke="${C.line}" stroke-width="2"/>`;
   for(const t of[0,.25,.5,.75,1]){s+=`<line x1="${sx(t)}" y1="34" x2="${sx(t)}" y2="42" stroke="${C.inkFaint}"/><text x="${sx(t)}" y="58" fill="${C.inkFaint}" font-size="9" text-anchor="middle">${t}</text>`;}
   s+=`<rect x="${sx(a.rLo)}" y="28" width="${Math.max(1,sx(a.rHi)-sx(a.rLo))}" height="20" rx="4" fill="${C.blue}" opacity="0.3"/>`;
-  s+=`<line x1="${sx(D.R)}" y1="24" x2="${sx(D.R)}" y2="52" stroke="${C.green}" stroke-width="1.5" stroke-dasharray="3 2"/>`;
-  s+=`<text x="${sx(D.R)}" y="20" fill="${C.green}" font-size="9" text-anchor="middle">true ${fmt2(D.R)}</text>`;
+  s+=`<line x1="${sx(D.R)}" y1="24" x2="${sx(D.R)}" y2="52" stroke="${C.stellar}" stroke-width="1.5" stroke-dasharray="3 2"/>`;
+  s+=`<text x="${sx(D.R)}" y="20" fill="${C.stellar}" font-size="9" text-anchor="middle">true ${fmt2(D.R)}</text>`;
   s+=`<line x1="${sx(a.rHat)}" y1="26" x2="${sx(a.rHat)}" y2="50" stroke="${C.amber}" stroke-width="2"/>`;
   s+=`<circle cx="${sx(a.rHat)}" cy="38" r="4" fill="${C.amber}"/>`;
-  return svgEl(W,H,s,'band')+`<div class="cap" style="text-align:center">estimated recall <span style="color:${C.amber}">◆</span> with 95% band · true recall <span style="color:${C.green}">┊</span></div>`;
+  return svgEl(W,H,s,'band')+`<div class="cap" style="text-align:center">estimated recall <span style="color:${C.amber}">◆</span> with 95% band · true recall <span style="color:${C.stellar}">┊</span></div>`;
 }
+
+/* ============================================================= *  DISCOVER MODE  * ============================================================= */
+function visualSessions(D){
+  const count=132,misCount=clamp(Math.round(STATE.pi*900),1,44);
+  const base=POOL.slice(0,220).sort((a,b)=>a.sort-b.sort).slice(0,count);
+  return base.map((p,i)=>{
+    const isMis=((i*37)%count)<misCount;let mu=isMis?D.muM:D.muB;
+    if(isMis&&p.v<STATE.pEvade)mu=D.muB;if(!isMis&&p.v<STATE.pDual)mu=D.muM;
+    const score=sigmoid(A_GAIN*(mu+p.lb));
+    const flagged=score>=STATE.tau;
+    return{isMis,score,sev:isMis?(p.sr>.74?3:p.sr>.38?2:1):0,flagged,co:isMis?(flagged?'tp':'fn'):(flagged?'fp':'tn'),id:p.sort,row:i};
+  });
+}
+function drawWorld(D){
+  const W=980,H=420,x0=205,x1=565,y0=74,y1=304,tauX=x0+STATE.tau*(x1-x0),sessions=visualSessions(D);
+  const flagged=sessions.filter(s=>s.flagged).sort((a,b)=>b.score-a.score),out={tp:D.TP,fp:D.FP,fn:D.FN,tn:D.TN};
+  const yFor=(s,i)=>y0+((i*29)%14)*(y1-y0)/13+(((i*17)%7)-3)*1.2;
+  let s='';
+  s+=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="${C.bg}"/>`;
+  s+=`<text x="24" y="34" fill="${C.stellar}" font-size="10" font-family="var(--mono)" letter-spacing="2.5">EVIDENCE MAP · ${fmtInt(NPOP)} sessions</text>`;
+  s+=`<text x="${W-24}" y="34" fill="${C.inkFaint}" font-size="10" font-family="var(--mono)" text-anchor="end" letter-spacing="2.5">evidence → intent → priority</text>`;
+  for(let i=0;i<18;i++){const sy=58+i*18,cx=tauX,cy=196,op=(.045+.11*(1-Math.abs(i-8.5)/9)).toFixed(3);
+    const startX=30+(i%3)*34,startY=44+i*19;
+    s+=`<path d="M ${startX} ${startY} C ${150+i*2} ${sy}, ${cx-95} ${cy-90+i*10}, ${cx} ${cy}" fill="none" stroke="${i%4===0?C.spindle:C.stellar}" stroke-width="1" opacity="${op}"/>`;}
+  s+=`<line x1="42" y1="356" x2="938" y2="356" stroke="${C.line}"/>`;
+  s+=`<text x="66" y="382" fill="${C.inkDim}" font-size="11">candidate activity</text>`;
+  s+=`<text x="334" y="382" fill="${C.inkDim}" font-size="11" text-anchor="middle">model score</text>`;
+  s+=`<text x="${tauX}" y="382" fill="${C.amber}" font-size="11" text-anchor="middle">review gate τ ${STATE.tau.toFixed(2)}</text>`;
+  s+=`<text x="690" y="382" fill="${C.inkDim}" font-size="11" text-anchor="middle">reviewer queue</text>`;
+  s+=`<text x="874" y="382" fill="${C.inkDim}" font-size="11" text-anchor="middle">outcomes</text>`;
+  s+=`<rect x="${x0}" y="${y0-24}" width="${x1-x0}" height="${y1-y0+48}" rx="8" fill="${C.panel}" stroke="${C.line}"/>`;
+  [0,.25,.5,.75,1].forEach(v=>{const x=x0+v*(x1-x0);s+=`<line x1="${x}" y1="${y0-12}" x2="${x}" y2="${y1+12}" stroke="${C.line}" stroke-width="1"/><text x="${x}" y="${y1+31}" fill="${C.inkFaint}" font-size="9" text-anchor="middle">${v}</text>`;});
+  s+=`<rect data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" x="${x0}" y="${y0-18}" width="${x1-x0}" height="${y1-y0+36}" fill="transparent" style="cursor:ew-resize"/>`;
+  s+=`<rect x="${tauX}" y="${y0-24}" width="${x1-tauX}" height="${y1-y0+48}" fill="${C.amber}" opacity=".045"/>`;
+  s+=`<line x1="${tauX}" y1="${y0-36}" x2="${tauX}" y2="${y1+26}" stroke="${C.amber}" stroke-width="2"/>`;
+  s+=`<g class="drag" data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" style="cursor:ew-resize"><rect x="${tauX-45}" y="${y0-55}" width="90" height="24" rx="5" fill="${C.amber}"/><text x="${tauX}" y="${y0-39}" fill="#20160a" font-size="11" font-weight="700" text-anchor="middle">drag τ ↔</text></g>`;
+  sessions.forEach((it,i)=>{const x=x0+it.score*(x1-x0),y=yFor(it,i),r=it.isMis?4.4:3.2,fill=it.isMis?C.misuse:C.benign,stroke=it.flagged?C.amber:'transparent',op=STATE.mode==='operational'&&it.co==='fn'?0.12:(it.isMis?0.9:0.42);
+    s+=`<circle ${cohortAttrs(it.co)} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${op}" stroke="${stroke}" stroke-width="${it.flagged?1.2:0}"/>`;});
+  flagged.slice(0,36).forEach((it,i)=>{const col=it.isMis?C.misuse:C.benign,x=635+(i%6)*18,y=92+Math.floor(i/6)*18;
+    s+=`<rect ${cohortAttrs(it.co)} x="${x}" y="${y}" width="13" height="13" rx="2.5" fill="${col}" opacity="${it.isMis?0.9:0.55}" stroke="${C.amber}" stroke-width=".8"/>`;});
+  s+=`<rect x="622" y="74" width="132" height="134" rx="7" fill="${C.panel2}" stroke="${C.line}"/>`;
+  s+=`<text x="688" y="64" fill="${C.inkDim}" font-size="10" text-anchor="middle">ranked flags</text>`;
+  const bins=[['tp','TP',out.tp,C.misuse,'caught'],['fp','FP',out.fp,C.benign,'false alarm'],['fn','FN',out.fn,C.misuse,'missed'],['tn','TN',out.tn,C.benign,'left alone']];
+  bins.forEach((b,i)=>{const x=806+(i%2)*76,y=78+Math.floor(i/2)*78,hide=STATE.mode==='operational'&&b[0]==='fn';
+    s+=`<g ${cohortAttrs(b[0])}><rect x="${x}" y="${y}" width="64" height="58" rx="7" fill="${b[3]}" opacity="${hide?0.06:0.16}" stroke="${b[0]==='tp'||b[0]==='fp'?C.amber:C.line}" ${hide?'stroke-dasharray="4 3"':''}/>`;
+    s+=`<text x="${x+9}" y="${y+18}" fill="${C.ink}" font-size="11" font-weight="700">${b[1]}</text><text x="${x+9}" y="${y+39}" fill="${hide?C.inkFaint:C.ink}" font-size="15" font-family="var(--mono)" font-weight="700">${hide?'??':fmtInt(b[2])}</text>`;
+    s+=`<text x="${x+9}" y="${y+51}" fill="${C.inkFaint}" font-size="8.5">${b[4]}</text></g>`;});
+  s+=`<text x="40" y="326" fill="${C.benign}" font-size="10">calm/benign</text><circle cx="32" cy="322" r="4" fill="${C.benign}" opacity=".55"/>`;
+  s+=`<text x="142" y="326" fill="${C.misuse}" font-size="10">warm/misuse</text><circle cx="134" cy="322" r="4" fill="${C.misuse}"/>`;
+  s+=`<text x="254" y="326" fill="${C.amber}" font-size="10">signal = review priority</text><circle cx="246" cy="322" r="4" fill="${C.amber}"/>`;
+  return svgEl(W,H,s,'world');
+}
+function predictionPrompt(id,question,actual,reveal,actionHtml){
+  const selected=STATE.prediction&&STATE.prediction.id===id?STATE.prediction.choice:null;
+  const opts=[['up','up'],['down','down'],['same','roughly unchanged']];
+  return `<div class="predict"><div class="pq">${question}</div><div class="pchoices">${opts.map(o=>`<button class="${selected===o[0]?'on':''}" onclick="setPrediction('${id}','${o[0]}')">${o[1]}</button>`).join('')}</div>
+    ${selected?`<div class="preveal"><b>Actual:</b> ${actual}<br>${reveal}</div>${actionHtml?`<div class="lesson-actions">${actionHtml}</div>`:''}`:''}</div>`;
+}
+function scenarioCards(){
+  return `<div class="learning-band"><div class="lesson-kicker">Scenario cards</div><div class="scenario-grid">${Object.entries(PRESETS).map(([k,p])=>
+    `<button class="scenario-card ${STATE.preset===k?'on':''}" onclick="applyPreset('${k}')"><span class="st">${p.label}</span><span class="schanges">${p.changes}</span><span class="sbody">${p.breaks}</span><span class="scatch">KPI that catches it: <b>${p.catches}</b></span></button>`).join('')}</div></div>`;
+}
+function discoverMetricStrip(D){
+  return `<div class="chips">${chip('hero',fmt2(D.Fb),'F'+STATE.beta.toFixed(0)+' score','north-star')}${chip('info',fmt2(D.P),'precision')}${chip('info',fmt2(D.R),'recall')}${chip('bad',pctp(D.FPR),'FPR')}${chip('signal',fmt3(D.prAuc),'PR-AUC')}</div>`;
+}
+function questionBand(L){
+  if(!L.questions||!L.questions.length)return '';
+  return `<div class="question-band"><div class="qtitle">Questions this lesson answers</div><div class="question-list">${L.questions.map(q=>`<div class="qitem">${q}</div>`).join('')}</div></div>`;
+}
+function discoverNav(){
+  const i=STATE.lessonId,prev=DISCOVERY_LESSONS[i-1],next=DISCOVERY_LESSONS[i+1];
+  return `<div class="discover-nav">${prev?`<button onclick="setLesson(${i-1})">← ${prev.short}</button>`:`<button disabled>← start</button>`}<button onclick="setViewMode('reference')">Open Reference tab</button>${next?`<button class="next" onclick="setLesson(${i+1})">${next.short} →</button>`:`<button class="next" disabled>complete</button>`}</div>`;
+}
+function renderDiscover(D){
+  const L=DISCOVERY_LESSONS[STATE.lessonId];
+  return `<div class="discover"><div class="discover-hero"><div class="lesson-copy"><div class="lesson-kicker">Guided Discovery · ${String(STATE.lessonId+1).padStart(2,'0')} / ${DISCOVERY_LESSONS.length}</div><h2>${L.title}</h2><p>${L.body}</p><div style="margin-top:16px">${discoverMetricStrip(D)}</div></div><div class="world-card"><div class="cap">ASTRAL World — scattered behavior converging to one review-priority signal. Drag the amber threshold in the field.</div><div class="world-frame">${drawWorld(D)}</div></div></div>${questionBand(L)}${L.render(D)}${scenarioCards()}${discoverNav()}</div>`;
+}
+function drawReviewerDesk(D){
+  const o=ensureNdcgOrder(D),rowH=34,W=620,H=54+o.length*rowH+26,deskTop=48;
+  const dcg=o.reduce((a,x,i)=>a+x.sev/Math.log2(i+2),0),ideal=o.map(x=>x.sev).sort((a,b)=>b-a),idcg=ideal.reduce((a,r,i)=>a+r/Math.log2(i+2),0);
+  STATE._ndcgLive=safeDiv(dcg,idcg);
+  const reviewN=Math.min(Math.max(1,STATE.k),o.length),col=v=>v===3?C.red:v===2?C.amber:v===1?C.blue:C.inkFaint,lab=v=>v===3?'P5 · critical':v===2?'P4 · escalate':v===1?'P3 · review':'P1 · clear';
+  let s=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="${C.bg}"/><text x="18" y="28" fill="${C.stellar}" font-size="10" font-family="var(--mono)" letter-spacing="2.3">REVIEWER DESK</text><text x="${W-18}" y="28" fill="${C.amber}" font-size="10" font-family="var(--mono)" text-anchor="end">NDCG ${fmt3(STATE._ndcgLive)}</text>`;
+  o.forEach((x,i)=>{const y=deskTop+i*rowH,seen=i<reviewN,disc=1/Math.log2(i+2),gain=x.sev*disc;
+    s+=`<rect x="16" y="${y}" width="${W-32}" height="${rowH-7}" rx="6" fill="${seen?C.panel2:C.panel}" stroke="${seen?C.lineB:C.line}"/>`;
+    if(i===reviewN)s+=`<line x1="16" y1="${y-5}" x2="${W-16}" y2="${y-5}" stroke="${C.amber}" stroke-width="2" stroke-dasharray="6 4"/>`;
+    s+=`<text x="32" y="${y+18}" fill="${seen?C.amber:C.inkFaint}" font-size="10" font-family="var(--mono)">#${i+1}</text>`;
+    s+=`<circle cx="70" cy="${y+14}" r="5" fill="${x.mis?col(x.sev):C.inkFaint}" opacity="${x.mis?1:.55}"/>`;
+    s+=`<text x="88" y="${y+18}" fill="${C.ink}" font-size="12">${x.mis?'sme_h1_pilot_'+String(i+1).padStart(3,'0'):'benign_case_'+String(i+1).padStart(3,'0')}</text>`;
+    s+=`<rect x="254" y="${y+6}" width="106" height="17" rx="4" fill="${col(x.sev)}" opacity="${x.sev?0.16:.08}" stroke="${col(x.sev)}" stroke-width=".8"/><text x="266" y="${y+18}" fill="${col(x.sev)}" font-size="9.5" font-family="var(--mono)">${lab(x.sev)}</text>`;
+    s+=`<text x="392" y="${y+18}" fill="${C.inkFaint}" font-size="10">gain ${gain.toFixed(2)}</text>`;
+    s+=`<rect x="470" y="${y+8}" width="${Math.max(1,gain/3*82)}" height="12" rx="2" fill="${col(x.sev)}" opacity=".55"/>`;
+    s+=`<text x="${W-48}" y="${y+19}" fill="${i===0?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" role="button" tabindex="0" aria-label="Move rank ${i+1} up" onclick="reorderNdcg(${i},-1)" onkeydown="keyReorder(event,${i},-1)">▲</text>`;
+    s+=`<text x="${W-25}" y="${y+19}" fill="${i===o.length-1?C.inkFaint:C.inkDim}" font-size="14" style="cursor:pointer" role="button" tabindex="0" aria-label="Move rank ${i+1} down" onclick="reorderNdcg(${i},1)" onkeydown="keyReorder(event,${i},1)">▼</text>`;});
+  return svgEl(W,H,s,'desk');
+}
+
+const DISCOVERY_LESSONS=[
+{short:'Signal',spotlight:['pi','tau','sep'],title:'Signal in the noise',body:'Start with the core ASTRAL thesis: scattered interaction behavior becomes one review-priority signal. Change the base rate and watch rare misuse become hard to see even when the detector has not changed.',
+ questions:['If ASTRAL is good, why can the review queue still contain many benign sessions?','What changes when misuse is <b>rare</b> versus when the model itself gets worse?','Where do TP, FP, FN, and TN physically appear in one shared world?'],
+ render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Make misuse rarer</h3><p>Lower π and the world turns into a haystack. The coral cases are still the ones that matter, but the blue mass sets the operational burden.</p><div class="lesson-actions"><button class="btn amber" onclick="setSlider('pi',Math.max(0.0002,STATE.pi/4))">lower base rate π</button><button class="btn" onclick="setSlider('pi',Math.min(0.05,STATE.pi*4))">raise base rate π</button></div><div class="take"><b>Reveal:</b> rare misuse makes good-looking detectors harder to interpret.</div></div><div class="lesson-panel"><h3>Four outcomes, one matrix</h3>${drawConfusion(D)}</div></div>`;}},
+{short:'Threshold',spotlight:['tau','beta'],title:'The threshold bargain',body:'The amber line is not just a slider; it is the review gate. Tightening it can clean the queue while hiding more real misuse.',
+ questions:['Why is there no perfect threshold that maximizes everything at once?','Why did we choose a recall-first north-star instead of plain accuracy?','How does moving one gate change precision, recall, and F2 together?'],
+ render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Predict before moving τ</h3>${predictionPrompt('tau-up','If you raise the threshold, what happens to recall?','Recall goes down; precision usually goes up.','A stricter gate sends fewer sessions to review. That removes many false alarms, but it also lets more real misuse pass unseen.',`<button class="btn amber" onclick="setSlider('tau',Math.min(0.95,STATE.tau+0.12))">raise threshold τ</button>`)}</div><div class="lesson-panel"><h3>Precision + recall feed F2</h3>${drawDials(D)}<div class="take"><b>Reveal:</b> stricter gates usually reduce noise, but they can hide real misuse.</div></div></div>`;}},
+{short:'Rare risk',spotlight:['pi','tau'],title:'Rare risk, noisy queue',body:'Base-rate effects are one of the least intuitive parts of detection. Same model, same score separation, different world prevalence: precision can fall sharply.',
+ questions:['How can precision fall even when score separation did not change?','Why does the benign population dominate the queue at very low prevalence?','What data view tells us this is a base-rate effect, not detector regression?'],
+ render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Predict the base-rate trap</h3>${predictionPrompt('pi-down','If misuse gets rarer while the detector stays the same, what happens to precision?','Precision usually goes down.','There are so many benign sessions that even a small false-positive rate can outnumber true catches.',`<button class="btn amber" onclick="setSlider('pi',Math.max(0.0002,STATE.pi/5))">make misuse rarer</button>`)}</div><div class="lesson-panel"><h3>Queue composition</h3><div class="plotwrap">${drawQueue(D)}</div><div class="take"><b>Reveal:</b> precision can fall even when the detector did not get worse.</div></div></div>`;}},
+{short:'Flood',spotlight:['tau','pi','sep'],title:'False-alarm flood',body:'A low false-positive rate can still create a large review burden when almost all traffic is benign.',
+ questions:['Why track FPR if precision already tells us queue quality?','How does a tiny percentage become a large number of sessions at scale?','When does review load become a product problem rather than a statistics footnote?'],
+ render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Rate × scale</h3><p><span class="mono" style="color:${C.amber}">${pctp(D.FPR)}</span> of <span class="mono">${fmtInt(D.Nneg)}</span> benign sessions means <span class="mono" style="color:${C.signal}">${fmtInt(D.fpAbs)}</span> false alarms per 100,000.</p><div class="lesson-actions"><button class="btn amber" onclick="setSlider('tau',Math.max(0.02,STATE.tau-0.08))">loosen threshold τ</button><button class="btn" onclick="applyPreset('dualuse')">load dual-use benign</button></div><div class="take"><b>Reveal:</b> a small FPR can still create a large review burden at scale.</div></div><div class="lesson-panel"><h3>Operational load</h3>${gauge(D)}</div></div>`;}},
+{short:'Invisible',spotlight:['tau','sep','pi'],title:'Invisible misses',body:'Operational recall is difficult because the most important errors are the ones nobody sees. ASTRAL recommends; humans still need audit loops.',
+ questions:['Why can batch recall be counted while operational recall must be estimated?','What does ASTRAL fail to learn when false negatives never reach reviewers?','How does audit sampling turn hidden misses into an estimate with uncertainty?'],
+ render(D){const op=STATE.mode==='operational',a=D.audit;return `<div class="lesson-grid"><div class="lesson-panel"><h3>Toggle what reviewers can see</h3><p>Batch mode shows all labels. Operational mode hides the false negatives because they never reached a reviewer.</p><div class="lesson-actions"><button class="btn ${op?'':'amber'}" onclick="setMode('batch')">Batch</button><button class="btn ${op?'amber':''}" onclick="setMode('operational')">Operational</button>${op?`<button class="btn" onclick="rollAudit()">draw audit sample</button>`:''}</div><div class="take"><b>Reveal:</b> what the system fails to surface is also what reviewers cannot easily learn from.</div></div><div class="lesson-panel"><h3>Caught vs missed</h3>${drawRecall(D)}${op&&a?drawAuditBand(D):''}</div></div>`;}},
+{short:'Two verdicts',spotlight:['pi','sep'],title:'Two verdicts: ROC and PR',body:'ROC-AUC asks whether scores separate classes. PR-AUC asks whether the reviewed queue is actually useful at rare prevalence. ASTRAL needs both, but PR-AUC is the operational read.',
+ questions:['Why can ROC-AUC look strong while PR-AUC warns us?','Why does KPI 5a require a continuous risk score instead of a binary flag?','How does sweeping thresholds show score quality separately from one operating choice?'],
+ render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Same detector, two views</h3><div class="grid2"><div>${drawSepPR(D)}</div><div>${drawRoc(D)}</div></div><div class="take"><b>Reveal:</b> for rare misuse discovery, PR-AUC often tells the more operationally relevant story.</div></div><div class="lesson-panel"><h3>Base-rate scrubber</h3>${drawBaseRate(D)}${predictionPrompt('roc-pr','If π falls, which curve should move more?','PR-AUC moves more; ROC-AUC stays comparatively flat.','ROC is prevalence-blind. PR is anchored to the base rate, so it exposes precision collapse.',`<button class="btn amber" onclick="setSlider('pi',Math.max(0.0002,STATE.pi/5))">lower π</button>`)}</div></div>`;}},
+{short:'Hard actors',spotlight:['sep','tau'],title:'Hard actors hide in the average',body:'ASTRAL is only useful if it catches the actor who knows how to look ordinary. Blended metrics can hide that miss, so the sandbox splits the world by actor tier.',
+ questions:['How can the overall score look healthy while the hardest tier fails?','What is actor sophistication, and how is it different from model sophistication?','Which ground-truth labels are needed before this breakout is trustworthy?'],
+ render(D){const td=tierData(D),worst=td.rows[td.rows.length-1];return `<div class="lesson-grid"><div class="lesson-panel"><h3>Load evasive actors</h3><p>The sophisticated tier shifts toward benign-looking scores; the headline average may still look acceptable.</p><div class="lesson-actions"><button class="btn amber" onclick="applyPreset('evasion')">load sophisticated evasion</button><button class="btn" onclick="setSlider('sep',Math.min(4,STATE.sep+0.35))">increase separation d′</button></div><div class="take"><b>Reveal:</b> aggregate performance can hide the group that matters most.</div></div><div class="lesson-panel"><h3>Recall by actor tier</h3>${drawTiers(D)}<div class="cap">State-level recall now: <span class="mono" style="color:${worst.r<.5?C.misuse:C.amber}">${pct(worst.r)}</span></div></div></div>`;}},
+{short:'Reviewer desk',spotlight:['k','sep'],title:'Reviewer attention is ranked',body:'The product does not merely detect; it prioritizes scarce human attention. NDCG asks whether the highest-priority cases land where reviewers will actually see them.',
+ questions:['Why is detecting a case not enough if it lands below reviewer capacity?','How is NDCG different from precision, recall, and FPR?','Why do severity labels need reviewer agreement before NDCG is meaningful?'],
+ render(D){ensureNdcgOrder(D);return `<div class="lesson-grid"><div class="lesson-panel"><h3>Move a severe case</h3><p>Use the arrows to promote a case or move it below review capacity. Later ranks contribute less because a reviewer may never reach them.</p><div class="lesson-actions"><button class="btn amber" onclick="loadStateActor()">place a P5 case at rank 8</button><button class="btn" onclick="STATE.ndcgOrder=null;STATE.ndcgSig=null;renderContent()">restore ASTRAL order</button></div><div class="take"><b>Reveal:</b> ranking quality matters when reviewer attention is limited.</div></div><div class="lesson-panel"><h3>Reviewer desk</h3>${drawReviewerDesk(D)}</div></div>`;}}
+];
 
 /* ============================================================= *  TABS  * ============================================================= */
 const TABS=[
 {short:'Primer',spotlight:['tau','sep','pi'],
  title:'Start here — score, threshold, and the four outcomes',
  gloss:'Every session gets a risk score from 0 to 1. You pick a line — the threshold τ — and everything to its right is flagged for a human. The whole challenge is that the two crowds overlap. Get this picture and every KPI is just a question about it.',
- guide:'Grab the amber <b>τ</b> handle — or click anywhere on the chart — and slide it. The flagged zone swallows more of the red (misuse) curve, but watch how much green (benign) it drags in too. Then move <b>separation d′</b> and see the overlap shrink. (Hover any dotted term for a plain-language definition.)',
+ guide:'Grab the amber <b>τ</b> handle — or click anywhere on the chart — and slide it. The flagged zone swallows more of the coral (misuse) curve, but watch how much blue (benign) it drags in too. Then move <b>separation d′</b> and see the overlap shrink. (Hover any dotted term for a plain-language definition.)',
  render(D){return `<div class="sec"><div class="lbl">The picture</div>
     <div class="card"><div class="cap">Two overlapping crowds of sessions — drag the amber line (your threshold), or push the crowds apart (separation).</div><div class="plotwrap">${drawHist(D)}</div>
-      ${legend([{c:C.green,t:'benign — safe, everyday sessions'},{c:C.red,t:'real misuse'},{ring:1,t:'the line you drew'}])}</div></div>
+      ${legend([{c:C.stellar,t:'benign — safe, everyday sessions'},{c:C.red,t:'real misuse'},{ring:1,t:'the line you drew'}])}</div></div>
   <div class="sec"><div class="lbl">The four things that can happen</div><div class="chips">
     ${chip('misuse',fmtInt(D.TP),'Caught','real misuse, flagged')}
     ${chip('misuse',STATE.mode==='operational'?'hidden':fmtInt(D.FN),'Missed','real misuse, slipped past')}
@@ -849,26 +1125,26 @@ const TABS=[
 
 {short:'F2',spotlight:['tau','beta','sep'],dir:'up',
  title:'KPI 1 · F2 — the North-Star score',
- gloss:'One number blending precision and recall — but weighting a missed threat four times heavier than a false alarm. It’s what we tune the system against.',
+ gloss:'One number blending precision and recall — but weighting a missed misuse case four times heavier than a false alarm. It is the recall-first north-star, not a claim that the exact biological-risk cost ratio is settled.',
  guide:'Raise <b>threshold τ</b>. Precision climbs and recall falls — and because recall counts 4×, watch <b>F2 actually drop</b>. Then hit “tighten the queue” to see it in one click.',
  render(D){const b2=STATE.beta*STATE.beta;return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
-    Two words we’ll meet properly in the next tabs: <b>precision</b> — of everything we flag, how much is really misuse; and <b>recall</b> — of all the real misuse out there, how much we caught. F2 blends them into <em>one</em> score, but counts <span class="kw">recall 4× heavier</span> — because letting a real threat through is far worse than bothering a researcher.
+    Two words we’ll meet properly in the next tabs: <b>precision</b> — of everything we flag, how much is really misuse; and <b>recall</b> — of all the real misuse out there, how much we caught. F2 blends them into <em>one</em> score, but counts <span class="kw">recall 4× heavier</span> because this evaluation is intentionally recall-first. β=2 is a high-stakes detection convention; teams can recalibrate it later, but the direction is the product choice.
     <div class="take"><b>Takeaway:</b> F2 is the single number we try to push up. It’s the same <b>◆ north-star</b> in the bar above, so it reacts to every dial — watch it as your compass for “better or worse.”</div></div></div>
   <div class="sec"><div class="lbl">Precision + recall → one score</div>
-    <div class="card"><div class="cap">Two dials — <b>of flags, how many are real</b> and <b>of real threats, how many caught</b> — feeding the one north-star number.</div>${drawDials(D)}</div>
+    <div class="card"><div class="cap">Two dials — <b>of flags, how many are real</b> and <b>of real misuse cases, how many caught</b> — feeding the one north-star number.</div>${drawDials(D)}</div>
     <div class="chips" style="margin-top:14px">${chip('hero',fmt2(D.Fb),'F'+STATE.beta.toFixed(0)+' score','recall weighted 4×')}${chip('info',fmt2(D.P),'precision')}${chip('info',fmt2(D.R),'recall')}
       <div class="chip"><div class="lab" style="margin-top:2px">try it</div><div style="margin-top:8px"><button class="btn amber" onclick="setSlider('tau',Math.min(0.95,STATE.tau+0.12))">▸ tighten the queue (τ↑)</button></div></div></div>
     <div class="cap" style="margin-top:9px">Tighten the queue and precision climbs while recall drops. Because recall counts 4×, giving up a lot of it can pull F2 <em>down</em> — watch the north-star to see which way it actually goes here.</div></div>
   ${collapseMath('f2',`F<span class="v">${STATE.beta.toFixed(0)}</span> = (1+β²)·P·R / (β²·P + R) = (1+<span class="v">${b2.toFixed(0)}</span>)·<span class="v">${fmt2(D.P)}</span>·<span class="v">${fmt2(D.R)}</span> / (<span class="v">${b2.toFixed(0)}</span>·<span class="v">${fmt2(D.P)}</span> + <span class="v">${fmt2(D.R)}</span>) = <span class="res">${fmt2(D.Fb)}</span>`,`<div class="cap" style="margin-bottom:8px">The precision–recall trade-off: every threshold gives one (recall, precision) pair, and the amber dot is where τ sits now. β (the recall weight) lives here too — 2 means recall counts 2²=4×.</div><div class="plotwrap">${drawPR(D)}</div>`)}
-  ${breaks('f2','Chasing a clean queue by raising τ can crater recall — and because recall weighs 4×, F2 falls whenever that recall loss outweighs the precision gain. The metric is built to punish that instinct.','overcap')}`;}},
+  ${breaks('f2','Chasing a clean queue by raising τ can sharply reduce recall — and because recall weighs 4×, F2 falls whenever that recall loss outweighs the precision gain. The metric is built to keep that tradeoff visible.','overcap')}`;}},
 
 {short:'Precision',spotlight:['tau','k','pi'],dir:'up',
  title:'KPI 2 · Precision — how much of the queue is worth it',
  gloss:'Of the sessions we send to a reviewer, what fraction are actually real misuse? The noise-in-the-queue metric.',
  guide:'Slide <b>base rate π</b> down toward 0.1%. The queue turns mostly red — at rare base rates most flags are false alarms, even from a good detector. This is the trap the next tabs explain.',
  render(D){return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
-    Every false alarm is a real person’s time spent on a session that was never a threat. Precision is the share of flags that pay off.
-    <div class="take"><b>Takeaway:</b> low precision burns reviewer hours — most of their day goes to sessions that were never a threat.</div></div></div>
+    Every false alarm is a real person’s time spent on a session that was never misuse. Precision is the share of flags that pay off.
+    <div class="take"><b>Takeaway:</b> low precision burns reviewer hours — most of their day goes to sessions that were never misuse.</div></div></div>
   <div class="sec"><div class="lbl">The reviewer’s queue</div><div class="card"><div class="cap">Top of the flagged list, ranked by score. Real cases rise toward the top; the dashed line is how far down a reviewer can actually get today.</div>
     <div class="plotwrap">${drawQueue(D)}</div>${legend([{c:C.misuse,t:'real misuse (worth it)'},{c:C.benign,t:'false alarm (wasted)'},{ring:1,t:'above dashed line = reviewed'}])}</div>
     <div class="chips" style="margin-top:14px">${chip('hero',fmt2(D.P),'precision','of flags, the share that are real')}${chip('info',D.NNR!=null?D.NNR.toFixed(1):'—','number-needed-to-review','sessions opened to find 1 real case')}</div></div>
@@ -882,13 +1158,13 @@ const TABS=[
  guide:'Nudge <b>threshold τ</b> down a touch. The percentage barely moves, but watch the <b>absolute count</b> of flagged researchers jump — that’s the scale trap.',
  render(D){return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
     FPR is friction — the share of innocent researchers ASTRAL bothers. The trap is scale: 0.15% sounds harmless until you multiply by a huge benign population.
-    <div class="take"><b>Takeaway:</b> a “small” FPR can still bury the team, and chronic false alarms train reviewers to ignore the alert.</div></div></div>
+    <div class="take"><b>Takeaway:</b> a “small” FPR can still exceed review capacity, and chronic false alarms make triage less reliable.</div></div></div>
   <div class="sec"><div class="lbl">A tiny rate, a big pile</div>
     <div class="card"><div class="cap">The benign population — each dot ≈ ${fmtInt(D.Nneg/800)} people. Gold = wrongly flagged. A tiny rate across a huge crowd is still a big pile.</div>${drawFpr(D)}
       ${legend([{c:C.benign,t:'benign, left alone'},{c:C.signal,t:'benign, wrongly flagged'}])}</div>
     <div class="chips" style="margin-top:14px">${chip('hero',pctp(D.FPR),'FPR','share of innocents flagged')}${chip('bad',fmtInt(D.fpAbs),'researchers flagged','the real number of people')}</div>
     <div class="card" style="margin-top:12px"><span class="mono" style="color:${C.amber}">${pctp(D.FPR)}</span> × ${fmtInt(D.Nneg)} benign sessions = <span class="mono" style="color:${C.signal}">${fmtInt(D.fpAbs)}</span> real researchers pulled into the review queue.</div></div>
-  ${collapseMath('fpr',`FPR = FP / (FP + TN) = <span class="v">${fmtInt(D.FP)}</span> / (<span class="v">${fmtInt(D.FP)}</span> + <span class="v">${fmtInt(D.TN)}</span>) = <span class="res">${pctp(D.FPR)}</span>  <span class="op">·  also called 1 − specificity  ·  ${D.fpPer10k.toFixed(1)} per 10,000 benign</span>`,`<div class="cap" style="margin-bottom:8px"><b>Alert fatigue</b> — flags vs. what a human can actually work through. A reviewer can seriously investigate only a handful per hour (industrial alarm standard ≈ 6/hr); everything past that gets triaged or ignored.</div>${gauge(D)}`)}
+  ${collapseMath('fpr',`FPR = FP / (FP + TN) = <span class="v">${fmtInt(D.FP)}</span> / (<span class="v">${fmtInt(D.FP)}</span> + <span class="v">${fmtInt(D.TN)}</span>) = <span class="res">${pctp(D.FPR)}</span>  <span class="op">·  also called 1 − specificity  ·  ${D.fpPer10k.toFixed(1)} per 10,000 benign</span>`,`<div class="cap" style="margin-bottom:8px"><b>Review load</b> — flags vs. what a human can actually work through. A reviewer can seriously investigate only a handful per hour (industrial alarm standard ≈ 6/hr); everything past that becomes queue pressure.</div>${gauge(D)}`)}
   ${modeNote('Evaluated on a hard-negative corpus of confirmed-benign science — exact.','Estimated by monitoring flag rate on known-clean populations; the benign total is itself an estimate.')}
   ${breaks('fpr','If legitimate dual-use research drifts toward suspicious-looking scores, FPR balloons and the absolute count of bothered researchers explodes.','dualuse')}`;}},
 
@@ -898,7 +1174,7 @@ const TABS=[
  guide:'Switch <b>mode</b> to Operational (top-right). The missed cases fade out — you literally can’t see them. Then <b>draw an audit sample</b> below to estimate how many you’re missing.',
  render(D){const a=D.audit,op=STATE.mode==='operational';const roll=STATE.auditRoll?`Last draw: <b>${STATE.auditRoll.found}</b> misses in ${STATE.auditRoll.n} sampled → est. FN ≈ ${fmtInt(STATE.auditRoll.found/STATE.auditRoll.n*D.U)}`:'';
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
-    A session ASTRAL misses reaches no human at all — so a miss could be your most capable actor walking straight through. Recall is the share of real misuse you actually caught.
+    A session ASTRAL misses reaches no human at all — so the missed layer is where high-capability misuse can remain unreviewed. Recall is the share of real misuse you actually caught.
     <div class="take"><b>Takeaway:</b> in production you can count what you flagged, but not what you missed — the misses are invisible, which makes recall the hardest and most important number to pin down.</div></div></div>
   <div class="sec"><div class="lbl">Caught vs missed</div><div class="card"><div class="cap">Every real-misuse session, ranked by score. ✓ = caught.</div>${drawRecall(D)}
     ${legend([{ring:1,t:'caught (flagged)'},{c:C.inkFaint,t:op?'missed — invisible in production':'missed (false negative)'}])}</div>
@@ -911,7 +1187,7 @@ const TABS=[
       <input type="range" min="50" max="5000" step="50" value="${STATE.nAudit}" oninput="onLever('nAudit',this.value)"/><div class="subtag">bigger sample → narrower interval</div></div></div></div>`:''}
   ${collapseMath('rec',`recall = TP / (TP + FN) = <span class="v">${fmtInt(D.TP)}</span> / (<span class="v">${fmtInt(D.TP)}</span> + <span class="v">${fmtInt(D.FN)}</span>) = <span class="res">${fmt2(D.R)}</span>${op?`<br/>operational: FN&#770; = miss-rate × unflagged = <span class="v">${a?pctp(a.ph):'—'}</span> × <span class="v">${fmtInt(D.U)}</span> = <span class="res">${a?fmtInt(a.FNhat):'—'}</span>`:''}`)}
   ${modeNote('Both numerator and denominator are known — the cleanest recall you can measure.','You can’t count what you never saw, so recall has to be estimated from a sample — never measured exactly.')}
-  ${breaks('rec','A big gap between batch and operational recall signals environmental mismatch, benchmark overfitting, or adversarial evasion — sophisticated actors who deliberately score low so they never even enter the sample.','evasion')}`;}},
+  ${breaks('rec','A big gap between batch and operational recall signals environmental mismatch, benchmark overfitting, or adversarial evasion — sophisticated actors whose sessions score low enough that they never enter review.','evasion')}`;}},
 
 {short:'Separation',spotlight:['sep','pi','tau'],dir:'up',
  title:'KPI 5a · Score Separation — does the score mean something?',
@@ -920,53 +1196,53 @@ const TABS=[
  render(D){
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
     Pick a random misuse session and a random benign one — <span class="kw">how often does the misuse one score higher?</span> That's the score's separating power. <b>PR-AUC</b> judges it only on the flags (ignoring the huge benign pile ASTRAL correctly leaves alone); <b>ROC-AUC</b> includes that pile, which is what makes it look great precisely when misuse is rare.
-    <div class="take"><b>Takeaway:</b> trust <b>PR-AUC</b> at ASTRAL's base rates. A high ROC-AUC sitting next to a low PR-AUC is the tell that the ROC number is inflated by the benign mass.</div></div></div>
+    <div class="take"><b>Takeaway:</b> KPI 5a is used because it tests the <b>score itself</b>, not one chosen threshold. It only works if ASTRAL outputs a continuous risk score; a binary flag gives only two operating points and cannot tell this story.</div></div></div>
   <div class="sec"><div class="lbl">Two curves, two verdicts</div>
     <div class="chips" style="margin-bottom:13px">${chip('hero',fmt3(D.prAuc),'PR-AUC','the honest one · baseline = π')}${chip('info',fmt3(D.auc),'ROC-AUC','context · flattered by rare misuse')}</div>
     <div class="grid2">
       <div class="card"><div class="cap"><b>PR-AUC</b> — precision vs recall. The coin-flip baseline sits at the base rate, so any real skill shows immediately and precision collapse can't hide.</div><div class="plotwrap">${drawSepPR(D)}</div></div>
       <div class="card"><div class="cap"><b>ROC-AUC</b> — TPR vs FPR. Drag the point or τ. It hugs the corner even when the queue is mostly noise.</div><div class="plotwrap">${drawRoc(D)}</div></div></div></div>
   <div class="sec"><div class="lbl">The base-rate reveal</div><div class="card"><div class="cap">Sweep base rate π: ROC-AUC stays flat while PR-AUC tracks the real story — <b>same detector, two verdicts</b>.</div><div class="plotwrap">${drawBaseRate(D)}</div></div></div>
-  ${collapseMath('roc',`ROC-AUC = P(score(misuse) &gt; score(benign)) = trapezoid area = <span class="res">${fmt3(D.auc)}</span>${D.aucClosed!=null?`  ·  closed form Φ(d′/√2) = <span class="res">${fmt3(D.aucClosed)}</span>`:''}<br/>PR-AUC (average precision) = area under precision-vs-recall = <span class="res">${fmt3(D.prAuc)}</span>  ·  random-detector baseline = base rate π = <span class="v">${pctp(D.prBase)}</span>`,`<div class="cap" style="margin-bottom:8px">Why PR-AUC is primary here: its baseline moves with prevalence, so precision collapse can't hide behind the benign mass the way it does under ROC-AUC.</div>`)}
+  ${collapseMath('roc',`ROC-AUC = P(score(misuse) &gt; score(benign)) = trapezoid area = <span class="res">${fmt3(D.auc)}</span>${D.aucClosed!=null?`  ·  closed form Φ(d′/√2) = <span class="res">${fmt3(D.aucClosed)}</span>`:''}<br/>PR-AUC (average precision) = area under precision-vs-recall = <span class="res">${fmt3(D.prAuc)}</span>  ·  random-detector baseline = base rate π = <span class="v">${pctp(D.prBase)}</span>`,`<div class="cap" style="margin-bottom:8px">Why PR-AUC is primary here: its baseline moves with prevalence, so precision decline cannot hide behind the benign mass the way it does under ROC-AUC. Both curves require a continuous risk score because the threshold is swept across many possible cutoffs.</div>`)}
   ${modeNote('Both computed exactly by sweeping the threshold over known-labeled sessions; report PR-AUC alongside the benchmark base rate.','Estimable only over the reviewed subset — enriched for high scores — so both AUCs read optimistically. Treat as directional.')}
   ${breaks('roc','Sophisticated actors who avoid biological terminology score low; their misuse sits among the benign and both AUCs drop — exactly the failure you need to catch. The next tab splits it by actor tier so the sophisticated miss cannot hide in the average.','evasion')}`;}},
 
 {short:'By tier',spotlight:['sep','tau','pi'],dir:'up',
  title:'By actor tier — is the average hiding the hard actors?',
- gloss:'The benchmark spans novice to state-level actors. A single blended recall can read healthy while the sophisticated, highest-stakes actors slip through — so every headline number is also broken out by sophistication tier.',
+ gloss:'The benchmark spans novice to state-level actors. A single blended recall can read healthy while the most sophisticated tier underperforms — so every headline number is also broken out by sophistication tier.',
  guide:'Watch the <b>State-level</b> bar. The blended recall (amber line) can sit comfortably while the hardest tier is mostly missed — the easy cases are carrying the average. Raise <b>separation</b> to lift every tier, or load <b>sophisticated evasion</b> to sink the top one.',
  render(D){const td=tierData(D),worst=td.rows[td.rows.length-1],easy=td.rows[0];
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
     ASTRAL is tested against actors from clumsy novices to careful state-level teams. Sophisticated actors deliberately look ordinary, so they score lower and are harder to catch. One blended recall can hide that — so we split it by tier and stare at the hardest one.
-    <div class="take"><b>Takeaway:</b> a healthy blended number means little if the top tier is missed. The whole reason ASTRAL exists is to catch the actor who knows how to hide.</div></div></div>
+    <div class="take"><b>Takeaway:</b> a healthy blended number means little if the top tier is missed. The whole reason ASTRAL exists is to surface behavior that knows how to look ordinary.</div></div></div>
   <div class="sec"><div class="lbl">Recall, split by how hard the actor is to catch</div><div class="card"><div class="plotwrap">${drawTiers(D)}</div>
     ${legend([{c:C.stellar,t:'well caught'},{c:C.amber,t:'patchy'},{c:C.misuse,t:'mostly missed'}])}</div>
-    <div class="chips" style="margin-top:14px">${chip('hero',pct(td.overall),'blended recall','all tiers together')}${chip(worst.r<0.5?'misuse':'info',pct(worst.r),'state-level recall','the actor who hides')}</div></div>
+    <div class="chips" style="margin-top:14px">${chip('hero',pct(td.overall),'blended recall','all tiers together')}${chip(worst.r<0.5?'misuse':'info',pct(worst.r),'state-level recall','hardest tier')}</div></div>
   <div class="card" style="margin-top:12px">Blended recall <span class="mono" style="color:${C.amber}">${pct(td.overall)}</span> looks like ${td.overall>=0.6?'a solid detector':'room to improve'} — but you catch <span class="mono" style="color:${C.stellar}">${pct(easy.r)}</span> of novices and only <span class="mono" style="color:${C.misuse}">${pct(worst.r)}</span> of state-level actors. The average is carried by the easy cases.</div>
   ${collapseMath('tier',`per-tier recall = Φ( (d′/2 + tier offset) − τ★ )  ·  blended = Σ (tier share × tier recall) = <span class="res">${fmt3(td.overall)}</span><br/>tiers (share): ${TIERS.map(t=>t.name+' '+(t.w*100).toFixed(0)+'%').join(' · ')}`,`<div class="cap" style="margin-bottom:8px">F2 and NDCG@k are reported the same way — overall <em>and</em> per tier — so a strong headline can never be an average that buries the sophisticated actor. Recall is shown here as the clearest case.</div>`)}
   ${modeNote('Per-tier recall is exact — each synthetic session carries a sophistication label by construction.','Needs the sophistication label on reviewed sessions; on the un-flagged pile it inherits the same audit-sampling estimate as overall recall, now stratified by tier.')}
   ${breaks('tier','Load sophisticated evasion: the top-tier actors deliberately score like ordinary traffic, so the State-level bar collapses while the blended number barely moves — the exact blind spot a single average hides.','evasion')}`;}},
 
 {short:'NDCG@k',spotlight:['k','sep'],dir:'up',
- title:'KPI 5b · NDCG@k — are the worst cases at the top?',
- gloss:'A reviewer only reaches the top of the list. NDCG rewards putting the highest-severity sessions first and penalizes burying them — more for a miss at rank 1 than rank 10.',
- guide:'Use the <b>▲ ▼</b> arrows to sink a HIGH-severity case down the list — or hit “bury a HIGH case at rank 8” — and watch NDCG fall as the worst case drops below the fold.',
- render(D){if(!STATE.ndcgOrder||STATE.ndcgOrder.length!==ndcgN(D))STATE.ndcgOrder=ndcgInit(D);const svg=drawNdcg(D);
+ title:'KPI 5b · NDCG@k — are priority cases at the top?',
+ gloss:'A reviewer only reaches the top of the list. NDCG rewards putting the highest-severity sessions first and penalizes placing them lower — more for a low rank near the top than near the bottom.',
+ guide:'Use the <b>▲ ▼</b> arrows to move a P5 case down the list — or hit “place P5 at rank 8” — and watch NDCG fall as the priority case drops below the fold.',
+ render(D){ensureNdcgOrder(D);const svg=drawReviewerDesk(D);
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
     Detection isn’t enough — with limited slots, the <span class="kw">order</span> matters. A high-severity case at rank 8 counts far less than at rank 1 because of the log₂ position discount.
-    <div class="take"><b>Takeaway:</b> catching the worst actor is wasted if it’s buried below cases a reviewer never reaches.</div></div></div>
-  <div class="sec"><div class="lbl">The ranked queue · reorder with ▲ ▼</div><div class="card"><div class="cap">Top of the flagged list, coloured by severity. Later ranks contribute less.</div><div class="plotwrap">${svg}</div></div>
+    <div class="take"><b>Takeaway:</b> detection value is limited if the highest-priority case lands below the positions a reviewer reaches.</div></div></div>
+  <div class="sec"><div class="lbl">Reviewer desk · reorder with ▲ ▼</div><div class="card"><div class="cap">Top of the flagged list, colored by severity. Later ranks contribute less, and anything below capacity may not be reviewed today.</div><div class="plotwrap">${svg}</div></div>
     <div class="chips" style="margin-top:14px">${chip('hero',fmt3(STATE._ndcgLive),'NDCG@'+STATE.ndcgOrder.length,'1.0 = ideal order')}
-      <div class="chip"><div class="lab" style="margin-top:2px">scenario</div><div style="margin-top:8px"><button class="btn amber" onclick="loadStateActor()">▸ bury a HIGH case at rank 8</button></div></div>
-      <div class="chip"><div class="lab" style="margin-top:2px">reset</div><div style="margin-top:8px"><button class="btn" onclick="STATE.ndcgOrder=null;renderContent()">▸ restore ASTRAL order</button></div></div></div></div>
-  ${collapseMath('nd',`DCG@k = Σ severity(i) / log₂(i+1)  ·  severity HIGH=3 MED=2 LOW=1  ·  NDCG = DCG / IDCG = <span class="res">${fmt3(STATE._ndcgLive)}</span>`,`<div class="cap" style="margin-bottom:8px"><b>Before NDCG means anything, the severity labels have to be trustworthy.</b> Have 2–3 biosecurity reviewers rate a sample of sessions blind, and check their agreement (Krippendorff's α or weighted κ). Below ~0.6, NDCG is measuring reviewer disagreement, not ASTRAL's ranking — and that agreement score also caps the best NDCG ASTRAL can legitimately reach. It's a design-time check, not a live number.</div>`)}
-  ${modeNote('Computed exactly — severity is known by construction from the threat persona.','Estimable only on reviewed sessions, worked in ASTRAL’s order — so labels skew toward the top. Directional, and needs finalized severity buckets.')}
-  ${breaks('nd','A patient state-level actor can look mild turn-by-turn and land at rank 8, behind a flashy-but-benign academic question at rank 2. Detection was right; the ranking failed the reviewer.','rare')}`;}},
+      <div class="chip"><div class="lab" style="margin-top:2px">scenario</div><div style="margin-top:8px"><button class="btn amber" onclick="loadStateActor()">▸ place P5 at rank 8</button></div></div>
+      <div class="chip"><div class="lab" style="margin-top:2px">reset</div><div style="margin-top:8px"><button class="btn" onclick="STATE.ndcgOrder=null;STATE.ndcgSig=null;renderContent()">▸ restore ASTRAL order</button></div></div></div></div>
+  ${collapseMath('nd',`DCG@k = Σ severity(i) / log₂(i+1)  ·  severity P5=3 P4=2 P3=1  ·  NDCG = DCG / IDCG = <span class="res">${fmt3(STATE._ndcgLive)}</span>`,`<div class="cap" style="margin-bottom:8px"><b>Before NDCG means anything, the severity labels have to be trustworthy.</b> Have 2–3 biosecurity reviewers rate a sample of sessions blind, and check their agreement (Krippendorff's α or weighted κ). Below ~0.6, NDCG is measuring reviewer disagreement, not ASTRAL's ranking — and that agreement score also caps the best NDCG ASTRAL can legitimately reach. It's a design-time check, not a live number.</div>`)}
+  ${modeNote('Computed exactly — severity is known by construction from the labeled scenario.','Estimable only on reviewed sessions, worked in ASTRAL’s order — so labels skew toward the top. Directional, and needs finalized severity buckets.')}
+  ${breaks('nd','A sophisticated actor can look mild turn-by-turn and land at rank 8, behind a benign academic question at rank 2. Detection was right; prioritization did not put the higher-severity case first.','rare')}`;}},
 
 {short:'Attribution',spotlight:[],dir:'up',
  title:'KPI 6 · Attribution — is the actor profile right? (secondary)',
  gloss:'When ASTRAL says who the actor is (Commitment & Trajectory, capability, scope…), how close is that to the truth? Scored with chance-corrected, distance-weighted agreement.',
- guide:'Click the far-corner cell (truth CT1, ASTRAL says CT4) a few times to add bad calls. Watch <b>weighted κ</b> crash — that corner is the most dangerous kind of error, so it’s penalized hardest.',
+ guide:'Click the far-corner cell (truth CT1, ASTRAL says CT4) a few times to add distant calls. Watch <b>weighted κ</b> fall — that corner is the largest-distance error, so it is penalized hardest.',
  render(D){if(!STATE.ctM)STATE.ctM=ctMatrixDefault();const M=STATE.chance?ctChanceDemo():STATE.ctM;const kap=kappaW(M);
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
     This grades the <em>report</em> a reviewer receives, not whether the session was flagged. For an ordinal variable like <span class="kw">CT (Commitment &amp; Trajectory, 4 levels)</span>, off by one level is a near-miss; off by three is a serious error — so the penalty is distance-weighted (i−j)².
@@ -980,7 +1256,7 @@ const TABS=[
   <div class="sec"><div class="lbl">The other attribution fields</div><div class="card"><table class="mini">
     <tr><th>variable</th><th>type</th><th>scoring method</th></tr>
     <tr><td>CT · SC · AI · SD (1–k)</td><td>ordered scale</td><td>quadratic-weighted Cohen’s κ (near-misses get partial credit)</td></tr>
-    <tr><td>threat pathway</td><td>nominal category</td><td>unweighted κ (right category or not)</td></tr>
+    <tr><td>pathway</td><td>nominal category</td><td>unweighted κ (right category or not)</td></tr>
     <tr><td>Biological Tools</td><td>multi-label set</td><td>set precision &amp; recall (over- vs under-naming stay visible)</td></tr></table>
     <div class="chips" style="margin-top:12px">${chip('info','0.67','BT set precision','of named tools, share correct')}${chip('info','0.67','BT set recall','of true tools, share named')}</div></div></div>
   ${collapseMath('at',`κ = (P_o − P_e) / (1 − P_e)  ·  weight w(i,j) = 1 − (i−j)²/(k−1)²  (k=4 → /9)<br/>P_o = <span class="v">${fmt3(kap.Po)}</span>  P_e = <span class="v">${fmt3(kap.Pe)}</span>  →  κ_w = <span class="res">${fmt3(kap.kw)}</span>`)}
@@ -1008,9 +1284,9 @@ const GLOSSARY={
   'τ (threshold)':{d:'The score cutoff. Flag a session if its risk score ≥ τ. Lower τ flags more.',c:C.amber,u:'every tab'},
   'π (base rate)':{d:'Share of all sessions that are truly misuse. Bio-misuse is a rare event (often <0.1%).',c:C.red,u:'Primer, ROC'},
   'risk score':{d:'ASTRAL’s continuous 0–1 rating for a session — not just a yes/no flag.',c:C.blue,u:'Primer, ROC'},
-  'TP / FP / TN / FN':{d:'The four boxes of the confusion matrix at a threshold.',c:C.green,u:'Primer'},
+  'TP / FP / TN / FN':{d:'The four boxes of the confusion matrix at a threshold.',c:C.stellar,u:'Primer'},
   'precision':{d:'Of flagged sessions, the share that are real misuse. TP/(TP+FP).',c:C.blue,u:'Precision, F2'},
-  'recall (TPR)':{d:'Of all real misuse, the share flagged. TP/(TP+FN). The most critical detection metric.',c:C.green,u:'Recall, F2'},
+  'recall (TPR)':{d:'Of all real misuse, the share flagged. TP/(TP+FN). The most critical detection metric.',c:C.stellar,u:'Recall, F2'},
   'FPR':{d:'Of all benign sessions, the share wrongly flagged. FP/(FP+TN) = 1−specificity.',c:C.red,u:'FPR'},
   'F2 / Fβ':{d:'Blend of precision and recall; β=2 weights recall 4× heavier. The north-star.',c:C.amber,u:'F2'},
   'NNR':{d:'Number-needed-to-review = 1/precision. Sessions opened to find one real case.',c:C.blue,u:'Precision'},
@@ -1018,21 +1294,21 @@ const GLOSSARY={
   'ROC-AUC':{d:'Probability a random misuse scores above a random benign. Prevalence-blind — looks great when misuse is rare, so it’s reported only as context.',c:C.blue,u:'Separation'},
   'actor tier':{d:'Sophistication of the actor, novice → state-level. Harder tiers score lower; every headline metric is reported per tier so the sophisticated miss can’t hide in the average.',c:C.violet,u:'By tier'},
   'NDCG@k':{d:'Ranking quality in the top k, rewarding high-severity cases placed first.',c:C.violet,u:'NDCG@k'},
-  'weighted κ':{d:'Chance-corrected agreement; quadratic weights give partial credit for near-misses.',c:C.green,u:'Attribution'},
+  'weighted κ':{d:'Chance-corrected agreement; quadratic weights give partial credit for near-misses.',c:C.stellar,u:'Attribution'},
   'base-rate fallacy':{d:'When misuse is rare, precision can be terrible even with a high AUC.',c:C.amber,u:'ROC-AUC'},
-  'alert fatigue':{d:'Too many false alarms train reviewers to ignore the alert. ~6/hr is the ceiling.',c:C.red,u:'FPR'},
-  'audit sampling':{d:'Estimate invisible false negatives by reviewing a random sample of un-flagged sessions.',c:C.green,u:'Recall'}
+  'review load':{d:'Too many false alarms create more cases than reviewers can reliably inspect. ~6/hr is the ceiling.',c:C.red,u:'FPR'},
+  'audit sampling':{d:'Estimate invisible false negatives by reviewing a random sample of un-flagged sessions.',c:C.stellar,u:'Recall'}
 };
 
 /* ============================================================= *  Tooltips  * ============================================================= */
 const U='<span class="up arrow">↑ higher</span>', DN='<span class="dn arrow">↓ lower</span>';
 const TIPS={
-  'northstar':`<span class="th">◆ North-Star (F2)</span>One number for "is ASTRAL doing its job?" It blends precision and recall, but counts <b>catching real misuse 4× heavier</b> than avoiding false alarms.<br>The <b>arrow</b> shows whether your last move raised (<span class="up">▲</span>) or lowered (<span class="dn">▼</span>) F2. The <b>note</b> names the current weak link — a <em>noisy queue</em> (too many false alarms) or <em>misses</em> (real threats slipping past). At rare base rates it's usually the queue, even when recall is high.`,
+  'northstar':`<span class="th">◆ North-Star (F2)</span>One number for "is ASTRAL doing its job?" It blends precision and recall, but counts <b>catching real misuse 4× heavier</b> than avoiding false alarms.<br>The <b>arrow</b> shows whether your last move raised (<span class="up">▲</span>) or lowered (<span class="dn">▼</span>) F2. The <b>note</b> names the current weak link — a <em>noisy queue</em> (too many false alarms) or <em>misses</em> (real misuse passing through). At rare base rates it is usually the queue, even when recall is high.`,
   'lever-pi':`<span class="th">base rate π</span>How common real misuse actually is in the stream — bio-misuse is a rare event.<br>${U}: misuse is less rare, so flags are more often right (precision comes easier).<br>${DN}: a needle in a haystack — even an excellent detector produces mostly false alarms. This is the <b>base-rate trap</b>.`,
   'lever-sep':`<span class="th">separation d′</span>The detector's raw skill at telling misuse scores from benign scores.<br>${U}: the two score-crowds pull apart → every trade-off eases and AUC rises.<br>${DN}: they overlap → no threshold can cleanly split them.`,
-  'lever-tau':`<span class="th">threshold τ</span>The score cut-off: flag a session if its risk score ≥ τ.<br>${U} τ: flag fewer, only the most suspicious → cleaner queue (precision↑) but more misses (recall↓).<br>${DN} τ: flag more → catch more real misuse (recall↑) but bury reviewers in false alarms (FPR↑).`,
+  'lever-tau':`<span class="th">threshold τ</span>The score cut-off: flag a session if its risk score ≥ τ.<br>${U} τ: flag fewer, only the most suspicious → cleaner queue (precision↑) but more misses (recall↓).<br>${DN} τ: flag more → catch more real misuse (recall↑) but add more false alarms to review (FPR↑).`,
   'lever-k':`<span class="th">capacity k</span>How many flagged sessions a reviewer can actually open per shift.<br>${U}: more of the queue gets human eyes.<br>${DN}: only the very top of the ranking is seen → getting the order right (NDCG) matters more.`,
-  'lever-beta':`<span class="th">β · F-score weight</span>How much recall counts versus precision in the North-Star score.<br>${U} β: missing a real threat hurts the score more (recall-first).<br>${DN} β: false alarms hurt more (precision-first).<br>β = 2 → recall weighted <b>4×</b>.`,
+  'lever-beta':`<span class="th">β · F-score weight</span>How much recall counts versus precision in the North-Star score.<br>${U} β: missing a real misuse case hurts the score more (recall-first).<br>${DN} β: false alarms hurt more (precision-first).<br>β = 2 → recall weighted <b>4×</b>.`,
   'lever-mode':`<span class="th">Batch vs Operational</span><b>Batch</b> = a synthetic test set where every true label is known, so metrics are exact.<br><b>Operational</b> = live traffic — you only know labels for sessions a human reviewed, and missed cases (false negatives) are invisible.`,
   'lever-preset':`<span class="th">scenario preset</span>Jump the dials to a pre-set situation that stresses one failure mode — e.g. sophisticated evasion, rare-but-severe, or over-capacity.`,
   tau:`<span class="th">threshold τ</span>The score cut-off for flagging. Lower τ flags more (catches more, more false alarms); higher τ flags fewer (cleaner, more misses).`,
@@ -1040,10 +1316,10 @@ const TIPS={
   sep:`<span class="th">separation d′</span>How far apart the misuse and benign score distributions sit. Bigger = easier to separate.`,
   precision:`<span class="th">precision</span>Of the sessions flagged for review, the fraction that are genuinely misuse. High = little wasted reviewer time.`,
   precisionk:`<span class="th">precision@k</span>Precision among only the top-k highest-scored flags — what a capacity-limited reviewer actually sees. Usually higher than overall precision.`,
-  recall:`<span class="th">recall</span>Of all real misuse that exists, the fraction ASTRAL flagged. High = few dangerous sessions slip through. The most critical detection metric.`,
+  recall:`<span class="th">recall</span>Of all real misuse that exists, the fraction ASTRAL flagged. High = fewer real misuse sessions pass through unreviewed. The most critical detection metric.`,
   fpr:`<span class="th">false positive rate</span>Of all benign sessions, the fraction wrongly flagged. A tiny % still becomes a big pile of bothered researchers at scale.`,
   auc:`<span class="th">ROC-AUC</span>The chance a random misuse session scores higher than a random benign one. Measures the score's separating power at every threshold — but ignores how rare misuse is.`,
-  ndcg:`<span class="th">NDCG@k</span>Ranking quality of the top k: rewards putting the most severe cases first and penalizes burying them.`,
+  ndcg:`<span class="th">NDCG@k</span>Ranking quality of the top k: rewards putting the most severe cases first and penalizes placing them lower.`,
   nnr:`<span class="th">number-needed-to-review</span>= 1 ÷ precision. How many sessions a reviewer opens to find one real case. Lower is better.`,
   f2:`<span class="th">F2 · North-Star</span>Precision and recall blended into one score, with recall weighted 4× heavier. What we tune the system against.`,
   kappa:`<span class="th">weighted κ</span>Chance-corrected agreement between ASTRAL's actor profile and the truth, with bigger (further-off) errors penalized more.`
@@ -1086,10 +1362,12 @@ function startDrag(kind,el,e0){
   function apply(e){
     const px=(e.clientX-rect.left)/rect.width*W;
     if(kind==='tauHist'){const frac=clamp((px-14)/(520-28),0,1);STATE.tau=clamp(frac,0.02,0.98);}
+    else if(kind==='tauWorld'){const x0=parseFloat(el.getAttribute('data-x0')||205),x1=parseFloat(el.getAttribute('data-x1')||565);
+      const frac=clamp((px-x0)/(x1-x0),0,1);STATE.tau=clamp(frac,0.02,0.98);}
     else if(kind==='rocPt'){const frac=clamp((px-42)/(340-58),0,1);
       const zc=(-STATE.sep/2)-invPhi(clamp(frac,1e-4,1-1e-4));
       STATE.tau=clamp(sigmoid(A_GAIN*zc),0.02,0.98);}
-    STATE.auditRoll=null;STATE.lastLever='tau';noteOutcome();if(RAF)cancelAnimationFrame(RAF);RAF=requestAnimationFrame(render);}
+    STATE.auditRoll=null;STATE.lastLever='tau';resetRankingIfNeeded('tau');noteOutcome();if(RAF)cancelAnimationFrame(RAF);RAF=requestAnimationFrame(render);}
   apply(e0);   // jump to wherever you first clicked
   function up(){window.removeEventListener('pointermove',apply);window.removeEventListener('pointerup',up);}
   window.addEventListener('pointermove',apply);window.addEventListener('pointerup',up);}
@@ -1131,6 +1409,7 @@ function paintMotif(){const el=document.getElementById('wfield');if(el)el.innerH
 buildPool();buildControls();noteOutcome();
 let _startTheme='dark';try{if(localStorage.getItem('astral-theme')==='light')_startTheme='light';}catch(e){}
 setTheme(_startTheme);   // sets C palette, [data-theme], gradient defs, button label, then render()+paintMotif()
+showWelcome(true);
 selfTest();
 </script>
 </body>
