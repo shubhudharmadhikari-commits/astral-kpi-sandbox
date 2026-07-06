@@ -125,6 +125,8 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 /* ===== content ===== */
 .wrap{max-width:1120px;margin:0 auto;padding:24px 20px 96px}
 .tabhead h2{font-size:22px;letter-spacing:-.015em;text-wrap:balance}
+.dirchip{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.02em;color:var(--ink-dim);border:1px solid var(--line-bright);border-radius:20px;padding:2px 10px;margin-top:8px}
+.dirchip b{color:var(--amber);font-weight:700}
 .tabhead .gloss{color:var(--ink-dim);font-size:14px;margin-top:6px;max-width:74ch}
 .guide{display:flex;gap:11px;align-items:flex-start;margin-top:16px;background:linear-gradient(90deg,rgba(231,178,76,.09),rgba(231,178,76,.02));border:1px solid var(--amber-dim);border-radius:11px;padding:12px 15px}
 .guide .gtag{flex:0 0 auto;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:#20160a;background:var(--amber);padding:4px 8px;border-radius:6px;margin-top:1px}
@@ -385,6 +387,10 @@ function deriveState(S){
   let auc=0;for(let i=1;i<roc.length;i++)auc+=0.5*(roc[i].tpr+roc[i-1].tpr)*(roc[i].fpr-roc[i-1].fpr);
   auc=clamp(auc,0,1);
   const aucClosed=(S.pEvade<EPS&&S.pDual<EPS)?Phi(S.sep/SQRT2):null;
+  // PR curve + PR-AUC (average precision). precision at each threshold via Bayes; integrate precision over recall.
+  const pr=roc.map(p=>{const num=S.pi*p.tpr,den=num+(1-S.pi)*p.fpr;return{r:p.tpr,p:den<EPS?null:num/den};}).filter(x=>x.p!=null).sort((a,b)=>a.r-b.r);
+  let prAuc=0;for(let i=1;i<pr.length;i++)prAuc+=0.5*(pr[i].p+pr[i-1].p)*(pr[i].r-pr[i-1].r);
+  prAuc=clamp(prAuc,0,1);const prBase=S.pi;   // a random detector's PR-AUC ≈ the base rate
   function flaggedAt(zc){return Npos*TPRfn(S,muB,muM,zc)+Nneg*FPRfn(S,muB,muM,zc);}
   let precK=null,zK=null;
   if(S.k>0&&S.k<=NPOP){let lo=-10,hi=10;
@@ -402,7 +408,7 @@ function deriveState(S){
     const pLo=clamp(center-half,0,1),pHi=clamp(center+half,0,1);
     const FNhat=ph*U;const rHat=safeDiv(TP,TP+FNhat),rHi=safeDiv(TP,TP+pLo*U),rLo=safeDiv(TP,TP+pHi*U);
     audit={n,ph,pLo,pHi,FNhat,rHat,rLo,rHi};}
-  return {muB,muM,TPR,FPR,Npos,Nneg,TP,FN,FP,TN,P,R,Fb,NNR,fpAbs,fpPer10k,roc,auc,aucClosed,precK,sess,flagged,unflagged,kk,top,U,missRate,audit};
+  return {muB,muM,TPR,FPR,Npos,Nneg,TP,FN,FP,TN,P,R,Fb,NNR,fpAbs,fpPer10k,roc,auc,aucClosed,pr,prAuc,prBase,precK,sess,flagged,unflagged,kk,top,U,missRate,audit};
 }
 
 /* ============================================================= *  SVG helpers  * ============================================================= */
@@ -543,7 +549,8 @@ function renderContent(){
 }
 
 /* ============================================================= *  Scaffold pieces  * ============================================================= */
-function tabHead(t){return `<div class="tabhead"><h2>${t.title}</h2><div class="gloss">${t.gloss}</div></div>`;}
+function tabHead(t){const d=t.dir?`<span class="dirchip"><b>${t.dir==='up'?'↑':'↓'}</b> ${t.dir==='up'?'higher is better':'lower is better'}</span>`:'';
+  return `<div class="tabhead"><h2>${t.title}</h2>${d}<div class="gloss">${t.gloss}</div></div>`;}
 function guideBox(t){return t.guide?`<div class="guide"><span class="gtag">▶ TRY THIS</span><span class="gtxt">${t.guide}</span></div>`:'';}
 function navBox(i){const prev=TABS[i-1],next=TABS[i+1];
   return `<div class="nav">
@@ -677,23 +684,64 @@ function drawRoc(D){
   s+=`<text x="13" y="${(m.t+H-m.b)/2}" fill="${C.inkDim}" font-size="10" text-anchor="middle" transform="rotate(-90 13 ${(m.t+H-m.b)/2})">True Positive Rate →</text>`;
   return svgEl(W,H,s,'roc');
 }
+function prAucAtPi(D,pi){const q=D.roc.map(p=>{const num=pi*p.tpr,den=num+(1-pi)*p.fpr;return{r:p.tpr,pp:den<EPS?null:num/den};}).filter(x=>x.pp!=null).sort((a,b)=>a.r-b.r);
+  let a=0;for(let i=1;i<q.length;i++)a+=0.5*(q[i].pp+q[i-1].pp)*(q[i].r-q[i-1].r);return clamp(a,0,1);}
 function drawBaseRate(D){
   const W=340,H=230,m={l:40,r:14,t:24,b:36};const sc=scaler(-3.7,-1.3,0,1,W,H,m),sx=sc.sx,sy=sc.sy;
-  const prec=pi=>(pi*D.TPR)/((pi*D.TPR)+(1-pi)*D.FPR);const pts=[];
-  for(let i=0;i<=60;i++){const lp=-3.7+2.4*i/60;pts.push({x:lp,y:prec(Math.pow(10,lp))});}let s='';
+  const prpts=[],base=[];
+  for(let i=0;i<=48;i++){const lp=-3.7+2.4*i/48,pi=Math.pow(10,lp);prpts.push({x:lp,y:prAucAtPi(D,pi)});base.push({x:lp,y:pi});}let s='';
   s+=`<rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="${C.bg}"/>`;
   s+=grid(sc,[-3,-2],[.25,.5,.75]);
+  s+=`<path d="${pathFrom(base,sx,sy)}" fill="none" stroke="${C.inkFaint}" stroke-width="1.3" stroke-dasharray="3 3"/>`;
+  s+=`<text x="${sx(-2.6)}" y="${sy(0.02)-4}" fill="${C.inkFaint}" font-size="9">coin-flip PR-AUC = π</text>`;
   s+=`<line x1="${sx(-3.7)}" y1="${sy(D.auc)}" x2="${sx(-1.3)}" y2="${sy(D.auc)}" stroke="${C.blue}" stroke-width="2.2"/>`;
-  s+=`<text x="${sx(-1.35)}" y="${sy(D.auc)-6}" fill="${C.blue}" font-size="10" text-anchor="end">AUC (flat) ${fmt2(D.auc)}</text>`;
-  s+=`<path d="${pathFrom(pts,sx,sy)}" fill="none" stroke="${C.red}" stroke-width="2.2"/>`;
-  s+=`<text x="${sx(-3.6)}" y="${sy(prec(0.0003))+14}" fill="${C.red}" font-size="10">precision(π)</text>`;
+  s+=`<text x="${sx(-1.35)}" y="${sy(D.auc)-6}" fill="${C.blue}" font-size="10" text-anchor="end">ROC-AUC (flat) ${fmt2(D.auc)}</text>`;
+  s+=`<path d="${pathFrom(prpts,sx,sy)}" fill="none" stroke="${C.amber}" stroke-width="2.4"/>`;
+  s+=`<text x="${sx(-3.62)}" y="${sy(prAucAtPi(D,0.0003))-6}" fill="${C.amber}" font-size="10">PR-AUC(π)</text>`;
   const lpc=Math.log10(STATE.pi);
-  s+=`<line x1="${sx(lpc)}" y1="${m.t}" x2="${sx(lpc)}" y2="${H-m.b}" stroke="${C.amber}" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-  s+=`<circle cx="${sx(lpc)}" cy="${sy(prec(STATE.pi))}" r="4.5" fill="${C.amber}" stroke="${C.bg}" stroke-width="1.5"/>`;
+  s+=`<line x1="${sx(lpc)}" y1="${m.t}" x2="${sx(lpc)}" y2="${H-m.b}" stroke="${C.amber}" stroke-width="1.3" stroke-dasharray="4 3" opacity=".6"/>`;
+  s+=`<circle cx="${sx(lpc)}" cy="${sy(D.prAuc)}" r="4.5" fill="${C.amber}" stroke="${C.bg}" stroke-width="1.5"/>`;
   s+=ticks(sc,[{v:-3.7,l:'.02%'},{v:-3,l:'.1%'},{v:-2,l:'1%'},{v:-1.3,l:'5%'}],[{v:0,l:'0'},{v:.5,l:'.5'},{v:1,l:'1'}]);
   s+=`<text x="${(m.l+W-m.r)/2}" y="${H-3}" fill="${C.inkDim}" font-size="10" text-anchor="middle">base rate π (log) →</text>`;
   return svgEl(W,H,s,'baserate');
 }
+function drawSepPR(D){
+  const W=340,H=320,m={l:44,r:16,t:16,b:38};const sc=scaler(0,1,0,1,W,H,m),sx=sc.sx,sy=sc.sy;let s='';
+  s+=`<rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="${C.bg}"/>`;
+  s+=grid(sc,[.25,.5,.75],[.25,.5,.75]);
+  s+=`<line x1="${sx(0)}" y1="${sy(D.prBase)}" x2="${sx(1)}" y2="${sy(D.prBase)}" stroke="${C.inkFaint}" stroke-dasharray="4 4"/>`;
+  s+=`<text x="${sx(0.02)}" y="${sy(D.prBase)-4}" fill="${C.inkFaint}" font-size="9">coin flip = base rate ${pctp(D.prBase)}</text>`;
+  const pts=D.pr.map(p=>({x:p.r,y:p.p}));
+  if(pts.length){s+=`<path d="${pathFrom(pts,sx,sy)} L ${sx(pts[pts.length-1].x)} ${sy(0)} L ${sx(pts[0].x)} ${sy(0)} Z" fill="${C.amber}" fill-opacity="0.13"/>`;
+    s+=`<path d="${pathFrom(pts,sx,sy)}" fill="none" stroke="${C.amber}" stroke-width="2.4"/>`;}
+  if(D.P!=null)s+=`<circle cx="${sx(D.R)}" cy="${sy(D.P)}" r="6" fill="${C.amber}" stroke="${C.bg}" stroke-width="2"/>`;
+  s+=`<rect x="${sx(0.30)}" y="${sy(0.94)}" width="150" height="26" rx="6" fill="${C.panel2}" stroke="${C.line}"/>`;
+  s+=`<text x="${sx(0.30)+10}" y="${sy(0.94)+17}" fill="${C.amber}" font-size="13" font-weight="600">PR-AUC = ${fmt3(D.prAuc)}</text>`;
+  s+=ticks(sc,[{v:0,l:'0'},{v:.5,l:'.5'},{v:1,l:'1'}],[{v:0,l:'0'},{v:.5,l:'.5'},{v:1,l:'1'}]);
+  s+=`<text x="${(m.l+W-m.r)/2}" y="${H-4}" fill="${C.inkDim}" font-size="10" text-anchor="middle">Recall →</text>`;
+  s+=`<text x="13" y="${(m.t+H-m.b)/2}" fill="${C.inkDim}" font-size="10" text-anchor="middle" transform="rotate(-90 13 ${(m.t+H-m.b)/2})">Precision →</text>`;
+  return svgEl(W,H,s,'seppr');
+}
+/* actor-sophistication tiers — same misuse population, split by how hard each actor is to catch.
+   offset shifts the tier's score distribution (higher tier = more evasive = lower scores). weights net ~0 so blended ≈ overall recall. */
+const TIERS=[{name:'Novice',off:0.6,w:0.40},{name:'Intermediate',off:0.1,w:0.30},{name:'Sophisticated',off:-0.6,w:0.20},{name:'State-level',off:-1.4,w:0.10}];
+function tierData(D){const zTau=logit(clamp(STATE.tau,1e-6,1-1e-6))/A_GAIN;let overall=0;
+  const rows=TIERS.map(t=>{let off=t.off;if(STATE.pEvade>EPS)off-=1.4*STATE.pEvade*(t.off<0?1:0.3);   // evasion sinks the harder tiers most
+    const r=clamp(Phi(D.muM+off-zTau),0,1);overall+=t.w*r;return{name:t.name,w:t.w,r};});
+  return{rows,overall};}
+function drawTiers(D){const td=tierData(D),rows=td.rows;
+  const W=560,rowH=48,padT=8,padB=30,H=rows.length*rowH+padT+padB,bx=132,bw=W-bx-64;
+  const tcol=r=>r>=0.7?C.stellar:r>=0.4?C.amber:C.misuse;let s='';
+  rows.forEach((t,i)=>{const cy=padT+i*rowH+rowH/2-4;
+    s+=`<text x="10" y="${cy+1}" fill="${C.ink}" font-size="13" font-weight="600">${t.name}</text>`;
+    s+=`<text x="10" y="${cy+16}" fill="${C.inkDim}" font-size="10">${(t.w*100).toFixed(0)}% of actors</text>`;
+    s+=`<rect x="${bx}" y="${cy-9}" width="${bw}" height="22" rx="6" fill="${C.panel3}"/>`;
+    s+=`<rect x="${bx}" y="${cy-9}" width="${(bw*t.r).toFixed(1)}" height="22" rx="6" fill="${tcol(t.r)}"/>`;
+    s+=`<text x="${bx+bw+9}" y="${cy+6}" fill="${tcol(t.r)}" font-size="14" font-weight="600" font-family="var(--mono)">${(t.r*100).toFixed(0)}%</text>`;});
+  const ox=bx+bw*td.overall;
+  s+=`<line x1="${ox}" y1="${padT-2}" x2="${ox}" y2="${H-padB+6}" stroke="${C.amber}" stroke-width="1.6" stroke-dasharray="4 3"/>`;
+  s+=`<text x="${clamp(ox,bx+22,bx+bw-22)}" y="${H-padB+20}" fill="${C.amber}" font-size="10.5" text-anchor="middle" font-weight="600">blended ${(td.overall*100).toFixed(0)}%</text>`;
+  return svgEl(W,H,s,'tiers');}
 const NDCG_SHOW=12;
 function ndcgN(D){return Math.min(D.top.length,NDCG_SHOW);}
 function ndcgInit(D){return D.top.slice(0,ndcgN(D)).map(s=>({sev:s.isMis?s.sev:0,mis:s.isMis}));}
@@ -799,7 +847,7 @@ const TABS=[
     <div class="take"><b>Takeaway:</b> one line can’t win everywhere. Every tab ahead simply names, measures, and prices one of these four outcomes.</div></div></div>
   ${collapseMath('primer',`caught <span class="v">${fmtInt(D.TP)}</span> · missed <span class="v">${fmtInt(D.FN)}</span> · false alarms <span class="v">${fmtInt(D.FP)}</span> · left alone <span class="v">${fmtInt(D.TN)}</span>  <span class="op">(per 100,000 sessions)</span>`,`<div class="cap" style="margin-bottom:9px">Analysts arrange these four counts in a 2×2 grid called a <b>confusion matrix</b> — rows are the truth, columns are what ASTRAL flagged. Every metric ahead is built from these four boxes.</div>${drawConfusion(D)}`)}`;}},
 
-{short:'F2',spotlight:['tau','beta','sep'],
+{short:'F2',spotlight:['tau','beta','sep'],dir:'up',
  title:'KPI 1 · F2 — the North-Star score',
  gloss:'One number blending precision and recall — but weighting a missed threat four times heavier than a false alarm. It’s what we tune the system against.',
  guide:'Raise <b>threshold τ</b>. Precision climbs and recall falls — and because recall counts 4×, watch <b>F2 actually drop</b>. Then hit “tighten the queue” to see it in one click.',
@@ -814,7 +862,7 @@ const TABS=[
   ${collapseMath('f2',`F<span class="v">${STATE.beta.toFixed(0)}</span> = (1+β²)·P·R / (β²·P + R) = (1+<span class="v">${b2.toFixed(0)}</span>)·<span class="v">${fmt2(D.P)}</span>·<span class="v">${fmt2(D.R)}</span> / (<span class="v">${b2.toFixed(0)}</span>·<span class="v">${fmt2(D.P)}</span> + <span class="v">${fmt2(D.R)}</span>) = <span class="res">${fmt2(D.Fb)}</span>`,`<div class="cap" style="margin-bottom:8px">The precision–recall trade-off: every threshold gives one (recall, precision) pair, and the amber dot is where τ sits now. β (the recall weight) lives here too — 2 means recall counts 2²=4×.</div><div class="plotwrap">${drawPR(D)}</div>`)}
   ${breaks('f2','Chasing a clean queue by raising τ can crater recall — and because recall weighs 4×, F2 falls whenever that recall loss outweighs the precision gain. The metric is built to punish that instinct.','overcap')}`;}},
 
-{short:'Precision',spotlight:['tau','k','pi'],
+{short:'Precision',spotlight:['tau','k','pi'],dir:'up',
  title:'KPI 2 · Precision — how much of the queue is worth it',
  gloss:'Of the sessions we send to a reviewer, what fraction are actually real misuse? The noise-in-the-queue metric.',
  guide:'Slide <b>base rate π</b> down toward 0.1%. The queue turns mostly red — at rare base rates most flags are false alarms, even from a good detector. This is the trap the next tabs explain.',
@@ -828,7 +876,7 @@ const TABS=[
   ${modeNote('Every flagged session has a known label — count real vs. false alarms directly.','Reviewers only reach the top of the queue, so what you can actually measure live is <b>precision@k</b> — the share correct among the top '+STATE.k+' they open (here <b>'+fmt2(D.precK)+'</b>).')}
   ${breaks('pr','When misuse is rare and some benign science looks suspicious (dual-use), the queue fills with plausible false alarms and precision collapses — even with an “accurate” detector.','dualuse')}`;}},
 
-{short:'FPR',spotlight:['tau','pi','sep'],
+{short:'FPR',spotlight:['tau','pi','sep'],dir:'down',
  title:'KPI 3 · False Positive Rate — friction on legitimate users',
  gloss:'Of all the genuinely benign sessions, what fraction do we wrongly flag? A tiny percentage becomes a big pile at scale.',
  guide:'Nudge <b>threshold τ</b> down a touch. The percentage barely moves, but watch the <b>absolute count</b> of flagged researchers jump — that’s the scale trap.',
@@ -844,7 +892,7 @@ const TABS=[
   ${modeNote('Evaluated on a hard-negative corpus of confirmed-benign science — exact.','Estimated by monitoring flag rate on known-clean populations; the benign total is itself an estimate.')}
   ${breaks('fpr','If legitimate dual-use research drifts toward suspicious-looking scores, FPR balloons and the absolute count of bothered researchers explodes.','dualuse')}`;}},
 
-{short:'Recall',spotlight:['tau','sep','pi'],
+{short:'Recall',spotlight:['tau','sep','pi'],dir:'up',
  title:'KPI 4 · Recall — how much real misuse we catch',
  gloss:'Of all real misuse that exists, what fraction did we flag? The most operationally critical metric — and the one you can’t see directly in production.',
  guide:'Switch <b>mode</b> to Operational (top-right). The missed cases fade out — you literally can’t see them. Then <b>draw an audit sample</b> below to estimate how many you’re missing.',
@@ -865,24 +913,41 @@ const TABS=[
   ${modeNote('Both numerator and denominator are known — the cleanest recall you can measure.','You can’t count what you never saw, so recall has to be estimated from a sample — never measured exactly.')}
   ${breaks('rec','A big gap between batch and operational recall signals environmental mismatch, benchmark overfitting, or adversarial evasion — sophisticated actors who deliberately score low so they never even enter the sample.','evasion')}`;}},
 
-{short:'ROC-AUC',spotlight:['sep','pi','tau'],
- title:'KPI 5a · ROC-AUC — does the score mean something?',
- gloss:'How well the continuous risk score separates misuse from benign across every threshold. The honest caveat: it is prevalence-blind.',
- guide:'Drag <b>base rate π</b> down toward 0.02%. AUC barely flinches — but precision collapses. A great AUC can still mean a useless queue when misuse is rare.',
- render(D){const prec=(STATE.pi*D.TPR)/((STATE.pi*D.TPR)+(1-STATE.pi)*D.FPR);
+{short:'Separation',spotlight:['sep','pi','tau'],dir:'up',
+ title:'KPI 5a · Score Separation — does the score mean something?',
+ gloss:'How cleanly the risk score pushes real misuse above benign. PR-AUC is the honest read at rare base rates; ROC-AUC rides along as context and looks rosy precisely when misuse is rare.',
+ guide:'Drop <b>base rate π</b> toward 0.02%. ROC-AUC barely flinches — but PR-AUC slides toward the base rate, telling the truth: at rare prevalence the queue is mostly noise.',
+ render(D){
   return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
-    Pick a random misuse session and a random benign one. <span class="kw">AUC is the probability the misuse one scored higher.</span> 0.5 is a coin flip; 1.0 is perfect. It rewards a good score at every threshold at once.
-    <div class="take"><b>Takeaway:</b> AUC tells you whether the score is meaningful — but a great AUC can hide a terrible queue when misuse is rare (right).</div></div></div>
-  <div class="sec"><div class="lbl">Sweep the threshold · then break it</div><div class="grid2">
-    <div class="card"><div class="cap">ROC curve — drag the amber point or τ. Shaded area = AUC.</div><div class="plotwrap">${drawRoc(D)}</div>
-      <div class="cap">operating point → TPR ${fmt2(D.TPR)} · FPR ${pctp(D.FPR)}</div></div>
-    <div class="card"><div class="cap"><span class="warn">The base-rate trap</span> — drop π and watch AUC hold while precision craters.</div><div class="plotwrap">${drawBaseRate(D)}</div>
-      <div class="chips" style="margin-top:10px">${chip('info',fmt2(D.auc),'AUC','prevalence-blind')}${chip('bad',fmt2(prec),'precision','at current π')}</div></div></div></div>
-  ${collapseMath('roc',`AUC = P( score(misuse) &gt; score(benign) ) = trapezoid area = <span class="res">${fmt3(D.auc)}</span>${D.aucClosed!=null?`  ·  closed form Φ(d′/√2) = <span class="res">${fmt3(D.aucClosed)}</span>`:'  (mixtures active — closed form n/a)'}<br/>precision(π) = π·TPR / (π·TPR + (1−π)·FPR) → collapses as π→0, while <b>AUC has no π term</b>`)}
-  ${modeNote('Computed exactly by sweeping the threshold over known-labeled sessions.','Estimable only over the reviewed subset — enriched for high scores. Operational AUC is optimistically biased; treat as directional.')}
-  ${breaks('roc','Sophisticated actors who avoid biological terminology score low; their misuse sessions sit among the benign and AUC drops — exactly the failure you need to catch.','evasion')}`;}},
+    Pick a random misuse session and a random benign one — <span class="kw">how often does the misuse one score higher?</span> That's the score's separating power. <b>PR-AUC</b> judges it only on the flags (ignoring the huge benign pile ASTRAL correctly leaves alone); <b>ROC-AUC</b> includes that pile, which is what makes it look great precisely when misuse is rare.
+    <div class="take"><b>Takeaway:</b> trust <b>PR-AUC</b> at ASTRAL's base rates. A high ROC-AUC sitting next to a low PR-AUC is the tell that the ROC number is inflated by the benign mass.</div></div></div>
+  <div class="sec"><div class="lbl">Two curves, two verdicts</div>
+    <div class="chips" style="margin-bottom:13px">${chip('hero',fmt3(D.prAuc),'PR-AUC','the honest one · baseline = π')}${chip('info',fmt3(D.auc),'ROC-AUC','context · flattered by rare misuse')}</div>
+    <div class="grid2">
+      <div class="card"><div class="cap"><b>PR-AUC</b> — precision vs recall. The coin-flip baseline sits at the base rate, so any real skill shows immediately and precision collapse can't hide.</div><div class="plotwrap">${drawSepPR(D)}</div></div>
+      <div class="card"><div class="cap"><b>ROC-AUC</b> — TPR vs FPR. Drag the point or τ. It hugs the corner even when the queue is mostly noise.</div><div class="plotwrap">${drawRoc(D)}</div></div></div></div>
+  <div class="sec"><div class="lbl">The base-rate reveal</div><div class="card"><div class="cap">Sweep base rate π: ROC-AUC stays flat while PR-AUC tracks the real story — <b>same detector, two verdicts</b>.</div><div class="plotwrap">${drawBaseRate(D)}</div></div></div>
+  ${collapseMath('roc',`ROC-AUC = P(score(misuse) &gt; score(benign)) = trapezoid area = <span class="res">${fmt3(D.auc)}</span>${D.aucClosed!=null?`  ·  closed form Φ(d′/√2) = <span class="res">${fmt3(D.aucClosed)}</span>`:''}<br/>PR-AUC (average precision) = area under precision-vs-recall = <span class="res">${fmt3(D.prAuc)}</span>  ·  random-detector baseline = base rate π = <span class="v">${pctp(D.prBase)}</span>`,`<div class="cap" style="margin-bottom:8px">Why PR-AUC is primary here: its baseline moves with prevalence, so precision collapse can't hide behind the benign mass the way it does under ROC-AUC.</div>`)}
+  ${modeNote('Both computed exactly by sweeping the threshold over known-labeled sessions; report PR-AUC alongside the benchmark base rate.','Estimable only over the reviewed subset — enriched for high scores — so both AUCs read optimistically. Treat as directional.')}
+  ${breaks('roc','Sophisticated actors who avoid biological terminology score low; their misuse sits among the benign and both AUCs drop — exactly the failure you need to catch. The next tab splits it by actor tier so the sophisticated miss cannot hide in the average.','evasion')}`;}},
 
-{short:'NDCG@k',spotlight:['k','sep'],
+{short:'By tier',spotlight:['sep','tau','pi'],dir:'up',
+ title:'By actor tier — is the average hiding the hard actors?',
+ gloss:'The benchmark spans novice to state-level actors. A single blended recall can read healthy while the sophisticated, highest-stakes actors slip through — so every headline number is also broken out by sophistication tier.',
+ guide:'Watch the <b>State-level</b> bar. The blended recall (amber line) can sit comfortably while the hardest tier is mostly missed — the easy cases are carrying the average. Raise <b>separation</b> to lift every tier, or load <b>sophisticated evasion</b> to sink the top one.',
+ render(D){const td=tierData(D),worst=td.rows[td.rows.length-1],easy=td.rows[0];
+  return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
+    ASTRAL is tested against actors from clumsy novices to careful state-level teams. Sophisticated actors deliberately look ordinary, so they score lower and are harder to catch. One blended recall can hide that — so we split it by tier and stare at the hardest one.
+    <div class="take"><b>Takeaway:</b> a healthy blended number means little if the top tier is missed. The whole reason ASTRAL exists is to catch the actor who knows how to hide.</div></div></div>
+  <div class="sec"><div class="lbl">Recall, split by how hard the actor is to catch</div><div class="card"><div class="plotwrap">${drawTiers(D)}</div>
+    ${legend([{c:C.stellar,t:'well caught'},{c:C.amber,t:'patchy'},{c:C.misuse,t:'mostly missed'}])}</div>
+    <div class="chips" style="margin-top:14px">${chip('hero',pct(td.overall),'blended recall','all tiers together')}${chip(worst.r<0.5?'misuse':'info',pct(worst.r),'state-level recall','the actor who hides')}</div></div>
+  <div class="card" style="margin-top:12px">Blended recall <span class="mono" style="color:${C.amber}">${pct(td.overall)}</span> looks like ${td.overall>=0.6?'a solid detector':'room to improve'} — but you catch <span class="mono" style="color:${C.stellar}">${pct(easy.r)}</span> of novices and only <span class="mono" style="color:${C.misuse}">${pct(worst.r)}</span> of state-level actors. The average is carried by the easy cases.</div>
+  ${collapseMath('tier',`per-tier recall = Φ( (d′/2 + tier offset) − τ★ )  ·  blended = Σ (tier share × tier recall) = <span class="res">${fmt3(td.overall)}</span><br/>tiers (share): ${TIERS.map(t=>t.name+' '+(t.w*100).toFixed(0)+'%').join(' · ')}`,`<div class="cap" style="margin-bottom:8px">F2 and NDCG@k are reported the same way — overall <em>and</em> per tier — so a strong headline can never be an average that buries the sophisticated actor. Recall is shown here as the clearest case.</div>`)}
+  ${modeNote('Per-tier recall is exact — each synthetic session carries a sophistication label by construction.','Needs the sophistication label on reviewed sessions; on the un-flagged pile it inherits the same audit-sampling estimate as overall recall, now stratified by tier.')}
+  ${breaks('tier','Load sophisticated evasion: the top-tier actors deliberately score like ordinary traffic, so the State-level bar collapses while the blended number barely moves — the exact blind spot a single average hides.','evasion')}`;}},
+
+{short:'NDCG@k',spotlight:['k','sep'],dir:'up',
  title:'KPI 5b · NDCG@k — are the worst cases at the top?',
  gloss:'A reviewer only reaches the top of the list. NDCG rewards putting the highest-severity sessions first and penalizes burying them — more for a miss at rank 1 than rank 10.',
  guide:'Use the <b>▲ ▼</b> arrows to sink a HIGH-severity case down the list — or hit “bury a HIGH case at rank 8” — and watch NDCG fall as the worst case drops below the fold.',
@@ -894,11 +959,11 @@ const TABS=[
     <div class="chips" style="margin-top:14px">${chip('hero',fmt3(STATE._ndcgLive),'NDCG@'+STATE.ndcgOrder.length,'1.0 = ideal order')}
       <div class="chip"><div class="lab" style="margin-top:2px">scenario</div><div style="margin-top:8px"><button class="btn amber" onclick="loadStateActor()">▸ bury a HIGH case at rank 8</button></div></div>
       <div class="chip"><div class="lab" style="margin-top:2px">reset</div><div style="margin-top:8px"><button class="btn" onclick="STATE.ndcgOrder=null;renderContent()">▸ restore ASTRAL order</button></div></div></div></div>
-  ${collapseMath('nd',`DCG@k = Σ severity(i) / log₂(i+1)  ·  severity HIGH=3 MED=2 LOW=1  ·  NDCG = DCG / IDCG = <span class="res">${fmt3(STATE._ndcgLive)}</span>`)}
+  ${collapseMath('nd',`DCG@k = Σ severity(i) / log₂(i+1)  ·  severity HIGH=3 MED=2 LOW=1  ·  NDCG = DCG / IDCG = <span class="res">${fmt3(STATE._ndcgLive)}</span>`,`<div class="cap" style="margin-bottom:8px"><b>Before NDCG means anything, the severity labels have to be trustworthy.</b> Have 2–3 biosecurity reviewers rate a sample of sessions blind, and check their agreement (Krippendorff's α or weighted κ). Below ~0.6, NDCG is measuring reviewer disagreement, not ASTRAL's ranking — and that agreement score also caps the best NDCG ASTRAL can legitimately reach. It's a design-time check, not a live number.</div>`)}
   ${modeNote('Computed exactly — severity is known by construction from the threat persona.','Estimable only on reviewed sessions, worked in ASTRAL’s order — so labels skew toward the top. Directional, and needs finalized severity buckets.')}
   ${breaks('nd','A patient state-level actor can look mild turn-by-turn and land at rank 8, behind a flashy-but-benign academic question at rank 2. Detection was right; the ranking failed the reviewer.','rare')}`;}},
 
-{short:'Attribution',spotlight:[],
+{short:'Attribution',spotlight:[],dir:'up',
  title:'KPI 6 · Attribution — is the actor profile right? (secondary)',
  gloss:'When ASTRAL says who the actor is (Commitment & Trajectory, capability, scope…), how close is that to the truth? Scored with chance-corrected, distance-weighted agreement.',
  guide:'Click the far-corner cell (truth CT1, ASTRAL says CT4) a few times to add bad calls. Watch <b>weighted κ</b> crash — that corner is the most dangerous kind of error, so it’s penalized hardest.',
@@ -932,8 +997,10 @@ const TABS=[
     <tr><td>Precision</td><td>exact ✓</td><td>precision@k on reviewed flags</td></tr>
     <tr><td>FPR</td><td>exact on hard negatives ✓</td><td>estimated on known-clean traffic</td></tr>
     <tr><td>Recall</td><td>exact ✓</td><td>audit-sampling estimate + interval</td></tr>
-    <tr><td>ROC-AUC</td><td>exact ✓ (prevalence-blind)</td><td>selection-biased, directional</td></tr>
-    <tr><td>NDCG@k</td><td>exact (needs severity) ✓</td><td>directional, top-skewed</td></tr>
+    <tr><td>PR-AUC (primary)</td><td>exact ✓ · report with base rate</td><td>selection-biased, directional</td></tr>
+    <tr><td>ROC-AUC (context)</td><td>exact ✓ · flattered by rare misuse</td><td>selection-biased, directional</td></tr>
+    <tr><td>By actor tier</td><td>exact, per tier ✓</td><td>stratified audit estimate</td></tr>
+    <tr><td>NDCG@k</td><td>exact (needs reliable severity) ✓</td><td>directional, top-skewed</td></tr>
     <tr><td>Attribution κ</td><td>exact ✓</td><td>de-prioritized (too noisy)</td></tr></table></div></div>`;}}
 ];
 
@@ -947,7 +1014,9 @@ const GLOSSARY={
   'FPR':{d:'Of all benign sessions, the share wrongly flagged. FP/(FP+TN) = 1−specificity.',c:C.red,u:'FPR'},
   'F2 / Fβ':{d:'Blend of precision and recall; β=2 weights recall 4× heavier. The north-star.',c:C.amber,u:'F2'},
   'NNR':{d:'Number-needed-to-review = 1/precision. Sessions opened to find one real case.',c:C.blue,u:'Precision'},
-  'ROC-AUC':{d:'Probability a random misuse scores above a random benign. Prevalence-blind.',c:C.blue,u:'ROC-AUC'},
+  'PR-AUC':{d:'Average precision — score separation judged only on the flags. Baseline = the base rate, so precision collapse can’t hide. The primary separation metric at rare prevalence.',c:C.amber,u:'Separation'},
+  'ROC-AUC':{d:'Probability a random misuse scores above a random benign. Prevalence-blind — looks great when misuse is rare, so it’s reported only as context.',c:C.blue,u:'Separation'},
+  'actor tier':{d:'Sophistication of the actor, novice → state-level. Harder tiers score lower; every headline metric is reported per tier so the sophisticated miss can’t hide in the average.',c:C.violet,u:'By tier'},
   'NDCG@k':{d:'Ranking quality in the top k, rewarding high-severity cases placed first.',c:C.violet,u:'NDCG@k'},
   'weighted κ':{d:'Chance-corrected agreement; quadratic weights give partial credit for near-misses.',c:C.green,u:'Attribution'},
   'base-rate fallacy':{d:'When misuse is rare, precision can be terrible even with a high AUC.',c:C.amber,u:'ROC-AUC'},
