@@ -377,7 +377,7 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
   <linearGradient id="gWeave" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#4fc2a0"/><stop offset=".5" stop-color="#84a9ff"/><stop offset="1" stop-color="#e7b24c"/></linearGradient>
 </defs></svg>
 
-<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-desc">
+<div class="welcome hide" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title" aria-describedby="welcome-desc">
   <div class="wcard" tabindex="-1">
     <div class="whero"><div id="wfield" class="wfield" aria-hidden="true"></div>
       <svg class="mark-lg" width="46" height="46" viewBox="0 0 30 30" aria-hidden="true">
@@ -389,17 +389,17 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
       <div class="wmark">ASTRAL</div>
       <div class="wtag">Activity Scanner Tool for Risk Assessment of Logs</div>
     </div>
-    <h1 id="welcome-title">Guided Discovery: find the signal in the logs.</h1>
+    <h1 id="welcome-title">Reference Mode: start from the ASTRAL KPIs.</h1>
     <p id="welcome-desc">ASTRAL reads a sea of AI-interaction logs for biological-misuse risk, reconstructs intent over time, and surfaces a prioritized, evidence-cited assessment for human review. <b>How well it does that</b> comes down to a handful of numbers you can learn by moving the system yourself.</p>
-    <p>Everything here is <b>one shared assessment world</b> — scattered behavior, one legible focus. Nudge a dial and <b>every metric moves at once.</b></p>
+    <p>Start with the <b>Reference tabs</b>: each KPI gets its own question, formula, example, and failure mode. Everything still runs on <b>one shared assessment world</b>, so every dial moves every metric at once.</p>
     <div class="wsteps">
-      <div class="wstep"><span class="num">1</span><span>Play with the <b>dials</b> up top — how rare the risky behavior is, how sharp ASTRAL’s assessment is, and where you draw the line.</span></div>
-      <div class="wstep"><span class="num">2</span><span>Follow <b>Discover</b> first. Each lesson asks for one move, then reveals the statistical tradeoff it exposes.</span></div>
-      <div class="wstep"><span class="num">3</span><span>Switch to <b>Reference</b> when you want the full KPI tab, formula, or operational caveat.</span></div>
+      <div class="wstep"><span class="num">1</span><span>Use <b>Reference</b> as the primary product surface: KPI 1 starts with the north-star score, then each tab develops one metric.</span></div>
+      <div class="wstep"><span class="num">2</span><span>Move the <b>dials</b> up top — rarity, score separation, threshold, capacity — and watch the KPI cards respond in place.</span></div>
+      <div class="wstep"><span class="num">3</span><span>Treat <b>Discover</b> as an optional guided walkthrough for teams who want a slower conceptual path.</span></div>
     </div>
     <div class="wgo">
-      <button class="primary" data-initial-focus onclick="closeWelcome()">Start Guided Discovery →</button>
-      <button class="secondary" onclick="closeWelcome('reference')">Open Reference tabs</button>
+      <button class="primary" data-initial-focus onclick="closeWelcome('reference')">Open KPI Reference →</button>
+      <button class="secondary" onclick="closeWelcome('discover')">Optional Guided Discovery</button>
       <button class="secondary" onclick="closeWelcome(5)">Show PR-AUC surprise</button>
     </div>
   </div>
@@ -415,8 +415,8 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
     </svg>
     <div class="wordmark">ASTRAL<span class="sub">KPI Sandbox · learn the metrics by playing</span></div>
     <div class="viewseg" role="tablist" aria-label="learning mode">
-      <button id="view-discover" role="tab" onclick="setViewMode('discover')">Discover</button>
       <button id="view-reference" role="tab" onclick="setViewMode('reference')">Reference</button>
+      <button id="view-discover" role="tab" onclick="setViewMode('discover')">Discover</button>
     </div>
     <div class="spacer"></div>
     <div class="tag">DETECTION METRICS · <b>ONE SHARED WORLD</b></div>
@@ -426,7 +426,7 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
   </div>
   <div class="controls" id="controls"></div>
   <div class="scoreboard" id="health" title="How well ASTRAL is doing overall, and whether your last move helped or hurt."></div>
-  <div class="hint" id="hint"><b>↑ These dials are shared by every view.</b> Discover gives you the guided path; Reference keeps the full KPI tabs and math.</div>
+  <div class="hint" id="hint"><b>↑ These dials are shared by every KPI tab.</b> Reference is the primary surface; Discover is optional.</div>
   <div class="lessonbar" id="lessonbar" role="tablist" aria-label="guided discovery lessons"></div>
   <div class="tabs" id="tabs" role="tablist"></div>
 </div>
@@ -481,7 +481,7 @@ const pctp=x=>x==null?'—':(x*100).toFixed(2)+'%';
 
 /* ============================================================= *  STATE  * ============================================================= */
 const DEFAULTS={pi:0.01,sep:1.8,tau:0.60,k:50,beta:2,mode:'batch',preset:'baseline',pEvade:0,pDual:0,nAudit:500,seed:12345};
-let STATE=Object.assign({},DEFAULTS,{tab:0,viewMode:'discover',lessonId:0,lessonStep:0,focusCohort:null,prediction:null,flashKeys:[],scenarioFlash:null,isAdjusting:false,open:{},auditRoll:null,ndcgOrder:null,ndcgSig:null,ctM:null,chance:false});
+let STATE=Object.assign({},DEFAULTS,{tab:1,viewMode:'reference',lessonId:0,lessonStep:0,focusCohort:null,prediction:null,flashKeys:[],scenarioFlash:null,isAdjusting:false,open:{},auditRoll:null,ndcgOrder:null,ndcgSig:null,ctM:null,chance:false});
 
 const PRESETS={
   baseline:{label:'baseline',patch:{pi:0.01,sep:1.8,tau:0.60,k:50,pEvade:0,pDual:0},
@@ -618,9 +618,10 @@ function showWelcome(on){const w=document.getElementById('welcome');if(!w)return
   w.classList.toggle('hide',!on);setAppInert(on);
   if(on)window.setTimeout(()=>{(w.querySelector('[data-initial-focus]')||w.querySelector('.wcard')).focus();},0);}
 function closeWelcome(target){showWelcome(false);
-  if(target==='reference')setViewMode('reference');
+  if(target==='reference'||target==null)setViewMode('reference');
+  else if(target==='discover')setViewMode('discover');
   else if(target!=null)setTab(target);
-  else setViewMode('discover');}
+}
 function openWelcome(){showWelcome(true);}
 document.addEventListener('keydown',e=>{const w=document.getElementById('welcome');if(!w||w.classList.contains('hide'))return;
   if(e.key==='Escape'){e.preventDefault();showWelcome(false);return;}
@@ -733,8 +734,8 @@ function patchViewShell(){
   document.getElementById('view-reference').setAttribute('aria-selected',!discover);
   wrap.classList.toggle('discover-wrap',discover);
   hint.innerHTML=discover?
-    '<b>↑ These dials shape the same ASTRAL assessment world.</b> Follow the lesson bar, make one move, and watch the signal converge into a review priority.':
-    '<b>↑ These dials are shared by every Reference tab.</b> Hover dotted names for definitions; formulas stay tucked away until you ask for them.';
+    '<b>↑ Optional guided walkthrough.</b> Use this when someone wants a slower conceptual path; Reference remains the primary KPI surface.':
+    '<b>↑ Primary KPI Reference.</b> Each tab anchors one metric with its question, formula, example, and operational caveat.';
 }
 function renderLessonBar(){
   const el=document.getElementById('lessonbar'),discover=STATE.viewMode==='discover';
@@ -1591,7 +1592,7 @@ function paintMotif(){const el=document.getElementById('wfield');if(el)el.innerH
 buildPool();buildControls();noteOutcome();
 let _startTheme='dark';try{if(localStorage.getItem('astral-theme')==='light')_startTheme='light';}catch(e){}
 setTheme(_startTheme);   // sets C palette, [data-theme], gradient defs, button label, then render()+paintMotif()
-showWelcome(true);
+showWelcome(false);
 selfTest();
 </script>
 </body>
