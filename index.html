@@ -72,8 +72,8 @@ button{font-family:inherit;cursor:pointer}
 .top .tag b{color:var(--amber)}
 .ghostbtn{background:transparent;border:1px solid var(--line-bright);color:var(--ink-dim);font-size:11px;padding:6px 11px;border-radius:7px;transition:.15s}
 .ghostbtn:hover{color:var(--ink);border-color:var(--amber-dim);background:var(--panel)}
-.viewseg{display:inline-flex;border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;background:rgba(11,17,32,.55)}
-.viewseg button{background:transparent;border:0;color:var(--ink-dim);font-size:11px;padding:7px 12px;transition:.15s}
+.viewseg{display:inline-flex;align-items:center;height:30px;border:1px solid var(--line-bright);border-radius:8px;overflow:hidden;background:rgba(11,17,32,.55)}
+.viewseg button{display:flex;align-items:center;height:100%;background:transparent;border:0;color:var(--ink-dim);font-size:11px;padding:0 12px;transition:.15s}
 .viewseg button.on{background:var(--amber);color:#20160a;font-weight:700}
 .viewseg button:not(.on):hover{color:var(--ink);background:var(--panel-2)}
 
@@ -274,6 +274,8 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .question-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .qitem{background:rgba(132,169,255,.045);border:1px solid var(--line);border-radius:8px;padding:10px 11px;font-size:12px;line-height:1.45;color:var(--ink-dim)}
 .qitem b{color:var(--ink);font-weight:600}
+.qitem .qa{display:block;margin-top:7px;color:var(--ink);font-size:12px;line-height:1.45}
+.qitem .qa::before{content:'Answer: ';font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
 .foundation-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .fstep{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px;min-height:142px;position:relative}
 .fstep .num{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.1em;margin-bottom:8px}
@@ -391,7 +393,7 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
     </div>
     <h1 id="welcome-title">Reference Mode: start from the ASTRAL KPIs.</h1>
     <p id="welcome-desc">ASTRAL reads a sea of AI-interaction logs for biological-misuse risk, reconstructs intent over time, and surfaces a prioritized, evidence-cited assessment for human review. <b>How well it does that</b> comes down to a handful of numbers you can learn by moving the system yourself.</p>
-    <p>Start with the <b>Reference tabs</b>: each KPI gets its own question, formula, example, and failure mode. Everything still runs on <b>one shared assessment world</b>, so every dial moves every metric at once.</p>
+    <p>Start with the <b>Reference tabs</b>: each KPI gets its own question, formula, example, and failure mode. The controls use the same synthetic evaluation state, so every dial updates the KPI readouts consistently.</p>
     <div class="wsteps">
       <div class="wstep"><span class="num">1</span><span>Use <b>Reference</b> as the primary product surface: KPI 1 starts with the north-star score, then each tab develops one metric.</span></div>
       <div class="wstep"><span class="num">2</span><span>Move the <b>dials</b> up top — rarity, score separation, threshold, capacity — and watch the KPI cards respond in place.</span></div>
@@ -414,12 +416,12 @@ table.mini th{color:var(--ink-dim);font-weight:500;font-family:var(--mono);font-
       <circle cx="15" cy="6" r="3" fill="url(#gPt)"/><circle cx="15" cy="6" r="2.5" fill="#e7b24c"/>
     </svg>
     <div class="wordmark">ASTRAL<span class="sub">KPI Sandbox · learn the metrics by playing</span></div>
+    <div class="spacer"></div>
+    <div class="tag"><b>KPI REFERENCE</b> · EVAL SANDBOX</div>
     <div class="viewseg" role="tablist" aria-label="learning mode">
       <button id="view-reference" role="tab" onclick="setViewMode('reference')">Reference</button>
       <button id="view-discover" role="tab" onclick="setViewMode('discover')">Discover</button>
     </div>
-    <div class="spacer"></div>
-    <div class="tag">DETECTION METRICS · <b>ONE SHARED WORLD</b></div>
     <button class="ghostbtn" id="themebtn" onclick="toggleTheme()" aria-label="toggle light or dark mode">☀ light</button>
     <button class="ghostbtn" onclick="openWelcome()">? guide</button>
     <button class="ghostbtn" onclick="resetLevers()">reset</button>
@@ -828,7 +830,7 @@ function drawHist(D){
   return svgEl(W,H,s,'hist');
 }
 function drawConfusion(D){
-  const tot=D.TP+D.FN+D.FP+D.TN;const W=300,H=214,cw=118,ch=74,gx=54,gy=40,gap=8;
+  const tot=D.TP+D.FN+D.FP+D.TN;const W=336,H=220,cw=132,ch=76,gx=54,gy=40,gap=8;
   const cells=[['TP',D.TP,C.misuse,true,'caught'],['FN',D.FN,C.misuse,false,'missed'],
                ['FP',D.FP,C.benign,true,'false alarm'],['TN',D.TN,C.benign,false,'correct pass']];
   let s='';
@@ -843,7 +845,8 @@ function drawConfusion(D){
         stroke="${cl[3]?C.amber:C.line}" stroke-width="${cl[3]?1.6:1}" ${hide?'stroke-dasharray="4 3"':''}/>`;
     s+=`<text x="${x+12}" y="${y+21}" fill="${C.ink}" font-size="12" font-weight="700">${cl[0]}</text>`;
     s+=`<text x="${x+cw-10}" y="${y+21}" fill="${C.inkDim}" font-size="9" text-anchor="end">${cl[4]}</text>`;
-    s+=`<text x="${x+12}" y="${y+53}" fill="${hide?C.inkFaint:C.ink}" font-size="18" font-weight="600" font-family="${C.mono||'monospace'}">${hide?'??':fmtInt(cl[1])}</text></g>`;});
+    const val=hide?'??':fmtInt(cl[1]),fs=val.length>6?13:val.length>5?15:17;
+    s+=`<text x="${x+12}" y="${y+54}" fill="${hide?C.inkFaint:C.ink}" font-size="${fs}" font-weight="600" font-family="${C.mono||'monospace'}">${val}</text></g>`;});
   return svgEl(W,H,s,'conf');
 }
 function drawQueue(D){
@@ -901,7 +904,6 @@ function drawPrecisionWorld(D){
     s+=`<g ${cohortAttrs(b[0])}><rect x="${x}" y="${y}" width="96" height="38" rx="7" fill="${b[3]}" opacity="${active?.16:.055}" stroke="${active?C.amber:C.line}" ${!active?'stroke-dasharray="4 3"':''}/>`;
     s+=`<text x="${x+9}" y="${y+16}" fill="${active?C.ink:C.inkFaint}" font-size="10" font-weight="700">${b[1]}</text><text x="${x+37}" y="${y+16}" fill="${active?C.ink:C.inkFaint}" font-size="10">${hide?'hidden':fmtInt(b[2])}</text>`;
     s+=`<text x="${x+9}" y="${y+31}" fill="${C.inkFaint}" font-size="8.5">${b[4]}</text></g>`;});
-  s+=`<text x="74" y="286" fill="${C.benign}" font-size="10">blue = benign</text><text x="174" y="286" fill="${C.misuse}" font-size="10">coral = misuse</text><text x="286" y="286" fill="${C.amber}" font-size="10">amber = sent to review</text>`;
   return svgEl(W,H,s,'precision-world');
 }
 function drawPrecisionGate(D){
@@ -940,7 +942,7 @@ function precisionLearningView(D){
     <div class="concept-card dim" ${cohortAttrs('fn',true)}><b>FN · false negative</b><p>Real misuse that slipped past. It matters for Recall, but it is not inside this equation.</p></div>
     <div class="concept-card dim" ${cohortAttrs('tn',true)}><b>TN · true negative</b><p>Benign activity left alone. It matters for FPR, but not for queue quality.</p></div>
   </div></div>
-  <div class="sec"><div class="lbl">ASTRAL World: flagged versus not flagged</div><div class="precision-world-card"><div class="cap">The amber gate creates the reviewer queue. Precision looks only to the right side of that gate: <b>TP + FP</b>.</div><div class="precision-world-frame">${drawPrecisionWorld(D)}</div></div></div>
+  <div class="sec"><div class="lbl">Evidence map: flagged versus not flagged</div><div class="precision-world-card"><div class="cap">The amber gate creates the reviewer queue. Precision looks only to the right side of that gate: <b>TP + FP</b>.</div><div class="precision-world-frame">${drawPrecisionWorld(D)}</div>${legend([{c:C.benign,t:'benign activity'},{c:C.misuse,t:'misuse activity'},{ring:1,t:'sent to review'}])}</div></div>
   <div class="sec"><div class="lbl">Easy ASTRAL example</div><div class="precision-example"><p><b>Imagine ASTRAL flags 100 sessions.</b><br>18 are confirmed misuse and 82 are benign research that looked suspicious. Precision is <span class="mono" style="color:${C.amber}">18 / (18 + 82) = 18%</span>, so reviewers open about <span class="mono">5.6</span> sessions to find one real case.</p><div class="precision-dots">${drawPrecisionExampleDots()}</div></div></div>
   <div class="sec"><div class="lbl">Precision Lens</div><div class="precision-lens"><div class="precision-lens-head"><p><b>Make one move:</b> drag the gate or use the prediction prompt. Watch TP and FP change together before reading the final number.</p>${predictionPrompt('precision-tau-up','If the threshold gets stricter, what usually happens to Precision?','Precision often goes up.','Fewer benign sessions clear the gate, so false alarms usually fall. But some real misuse can now sit below the gate, which is why Recall and F2 still matter.',`<button class="btn amber" onclick="setSlider('tau',Math.min(0.95,STATE.tau+0.12))">raise threshold τ</button>`)}</div><div class="precision-lens-grid"><div class="precision-lens-panel"><h3>Threshold gate</h3><div class="cap">Drag the amber handle directly. The shaded region is what reaches reviewers.</div><div class="precision-gate-frame">${drawPrecisionGate(D)}</div></div><div class="precision-lens-panel"><h3>Reviewer queue</h3><div class="cap">Coral squares are true misuse; blue squares are false alarms. Precision is the coral share of this queue.</div><div class="precision-queue-frame">${drawPrecisionQueueLarge(D)}</div></div></div><div class="chips">${chip('hero',fmt2(D.P),'precision','TP / all flags')}${chip('misuse',fmtInt(D.TP),'caught (TP)','useful flags')}${chip('benign',fmtInt(D.FP),'false alarms','benign flags')}${chip('info',D.NNR!=null?D.NNR.toFixed(1):'—','number-needed-to-review','sessions opened per real case')}</div></div></div>
   <div class="sec"><div class="precision-handoff"><p><b>Precision tells us queue quality.</b> It does not tell us how much misuse ASTRAL missed. That is why FPR prices benign friction, Recall asks what escaped, and F2 ties the tradeoff back to the north-star.</p><button class="btn amber" onclick="setTab(4)">jump to Recall</button></div></div>
@@ -1183,18 +1185,15 @@ function drawWorld(D){
   s+=`<g class="drag" data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" style="cursor:ew-resize"><rect x="${tauX-45}" y="${y0-55}" width="90" height="24" rx="5" fill="${C.amber}"/><text x="${tauX}" y="${y0-39}" fill="#20160a" font-size="11" font-weight="700" text-anchor="middle">drag τ ↔</text></g>`;
   sessions.forEach((it,i)=>{const x=x0+it.score*(x1-x0),y=yFor(it,i),r=it.isMis?4.4:3.2,fill=it.isMis?C.misuse:C.benign,stroke=it.flagged?C.amber:'transparent',op=STATE.mode==='operational'&&it.co==='fn'?0.12:(it.isMis?0.9:0.42);
     s+=`<circle ${cohortAttrs(it.co)} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${op}" stroke="${stroke}" stroke-width="${it.flagged?1.2:0}"/>`;});
-  flagged.slice(0,36).forEach((it,i)=>{const col=it.isMis?C.misuse:C.benign,x=635+(i%6)*18,y=92+Math.floor(i/6)*18;
-    s+=`<rect ${cohortAttrs(it.co)} x="${x}" y="${y}" width="13" height="13" rx="2.5" fill="${col}" opacity="${it.isMis?0.9:0.55}" stroke="${C.amber}" stroke-width=".8"/>`;});
   s+=`<rect x="622" y="74" width="132" height="134" rx="7" fill="${C.panel2}" stroke="${C.line}"/>`;
   s+=`<text x="688" y="64" fill="${C.inkDim}" font-size="10" text-anchor="middle">ranked flags</text>`;
+  flagged.slice(0,36).forEach((it,i)=>{const col=it.isMis?C.misuse:C.benign,x=635+(i%6)*18,y=92+Math.floor(i/6)*18;
+    s+=`<rect ${cohortAttrs(it.co)} x="${x}" y="${y}" width="13" height="13" rx="2.5" fill="${col}" opacity="${it.isMis?0.9:0.55}" stroke="${C.amber}" stroke-width=".8"/>`;});
   const bins=[['tp','TP',out.tp,C.misuse,'caught'],['fp','FP',out.fp,C.benign,'false alarm'],['fn','FN',out.fn,C.misuse,'missed'],['tn','TN',out.tn,C.benign,'left alone']];
   bins.forEach((b,i)=>{const x=806+(i%2)*76,y=78+Math.floor(i/2)*78,hide=STATE.mode==='operational'&&b[0]==='fn';
     s+=`<g ${cohortAttrs(b[0])}><rect x="${x}" y="${y}" width="64" height="58" rx="7" fill="${b[3]}" opacity="${hide?0.06:0.16}" stroke="${b[0]==='tp'||b[0]==='fp'?C.amber:C.line}" ${hide?'stroke-dasharray="4 3"':''}/>`;
     s+=`<text x="${x+9}" y="${y+18}" fill="${C.ink}" font-size="11" font-weight="700">${b[1]}</text><text x="${x+9}" y="${y+39}" fill="${hide?C.inkFaint:C.ink}" font-size="15" font-family="var(--mono)" font-weight="700">${hide?'??':fmtInt(b[2])}</text>`;
     s+=`<text x="${x+9}" y="${y+51}" fill="${C.inkFaint}" font-size="8.5">${b[4]}</text></g>`;});
-  s+=`<text x="40" y="326" fill="${C.benign}" font-size="10">calm/benign</text><circle cx="32" cy="322" r="4" fill="${C.benign}" opacity=".55"/>`;
-  s+=`<text x="142" y="326" fill="${C.misuse}" font-size="10">warm/misuse</text><circle cx="134" cy="322" r="4" fill="${C.misuse}"/>`;
-  s+=`<text x="254" y="326" fill="${C.amber}" font-size="10">signal = review priority</text><circle cx="246" cy="322" r="4" fill="${C.amber}"/>`;
   return svgEl(W,H,s,'world');
 }
 function predictionPrompt(id,question,actual,reveal,actionHtml){
@@ -1210,9 +1209,38 @@ function scenarioCards(){
 function discoverMetricStrip(D){
   return `<div class="chips">${chip('hero',fmt2(D.Fb),'F'+STATE.beta.toFixed(0)+' score','north-star')}${chip('info',fmt2(D.P),'precision')}${chip('info',fmt2(D.R),'recall')}${chip('bad',pctp(D.FPR),'FPR')}${chip('signal',fmt3(D.prAuc),'PR-AUC')}</div>`;
 }
+const QUESTION_ANSWERS={
+  'What is ASTRAL evaluating before any metric appears?':'It is evaluating scored sessions: benign activity, risky misuse activity, and the threshold decision that sends some sessions to review.',
+  'Why do we need a continuous score instead of a binary flag?':'A continuous score lets teams move the threshold and see the tradeoff curve; a binary flag only shows one operating point.',
+  'How do the core KPIs connect back to the same four outcomes?':'Precision, recall, FPR, and F2 are all ratios built from TP, FP, FN, and TN.',
+  'If ASTRAL is good, why can the review queue still contain many benign sessions?':'Because misuse is rare. Even a small false-positive rate can produce many benign flags when the benign population is large.',
+  'What changes when misuse is <b>rare</b> versus when the model itself gets worse?':'Rarity changes the mix of the queue even if score quality stays fixed; model degradation changes how well the score separates misuse from benign activity.',
+  'Where do TP, FP, FN, and TN physically appear in the evidence map?':'TP and FP are on the flagged side of the gate; FN and TN stay below the gate and out of the review queue.',
+  'Why is there no perfect threshold that maximizes everything at once?':'Tightening the gate removes false positives but also creates more misses; loosening it catches more misuse but increases noise.',
+  'Why did we choose a recall-first north-star instead of plain accuracy?':'Accuracy is dominated by benign traffic. F2 makes missed misuse count more heavily, which matches the evaluation priority.',
+  'How does moving one gate change precision, recall, and F2 together?':'The threshold changes TP, FP, FN, and TN at once, so every derived KPI moves from the same underlying counts.',
+  'How can precision fall even when score separation did not change?':'If misuse becomes rarer, there are fewer true positives available, while the benign population can still generate many false positives.',
+  'Why does the benign population dominate the queue at very low prevalence?':'At low prevalence, benign sessions vastly outnumber misuse sessions, so small benign error rates can overwhelm true catches.',
+  'What data view tells us this is a base-rate effect, not detector regression?':'Compare prevalence changes while holding separation fixed; if precision shifts without separation changing, prevalence is the driver.',
+  'Why track FPR if precision already tells us queue quality?':'Precision describes queue mix. FPR describes how much legitimate activity is disrupted across the whole benign population.',
+  'How does a tiny percentage become a large number of sessions at scale?':'Multiply FPR by the benign session count; a small rate can become thousands of unnecessary reviews.',
+  'When does review load become a product problem rather than a statistics footnote?':'When false alarms exceed reviewer capacity or create repeated friction for legitimate users.',
+  'Why can batch recall be counted while operational recall must be estimated?':'Batch data has known labels for flagged and unflagged sessions. Live operations only reveal labels for reviewed sessions unless audits sample the hidden layer.',
+  'What does ASTRAL fail to learn when false negatives never reach reviewers?':'It misses examples of real misuse that looked benign, which are exactly the cases needed to improve recall.',
+  'How does audit sampling turn hidden misses into an estimate with uncertainty?':'Sampling unflagged sessions gives an estimated miss rate and confidence band instead of pretending the hidden layer is known exactly.',
+  'Why can ROC-AUC look strong while PR-AUC warns us?':'ROC includes true negatives, which are abundant when misuse is rare. PR focuses on the flagged/retrieved cases where operations feel the burden.',
+  'Why does KPI 5a require a continuous risk score instead of a binary flag?':'AUC requires sweeping thresholds across scores. A binary flag gives too few operating points to evaluate score separation.',
+  'How does sweeping thresholds show score quality separately from one operating choice?':'It tests the ranking of scores across many cutoffs rather than judging one chosen threshold.',
+  'How can the overall score look healthy while the hardest tier fails?':'Easy cases can carry the average while sophisticated actors cluster near benign behavior and get missed.',
+  'What is actor sophistication, and how is it different from model sophistication?':'Actor sophistication describes how evasive the user behavior is. Model sophistication describes the detector; the KPI asks whether the detector still works on hard actors.',
+  'Which ground-truth labels are needed before this breakout is trustworthy?':'You need reliable actor-tier labels and outcome labels so group-level recall is not measuring annotation noise.',
+  'Why is detecting a case not enough if it lands below reviewer capacity?':'A correctly detected case still has low operational value if reviewers never reach its rank.',
+  'How is NDCG different from precision, recall, and FPR?':'NDCG evaluates ordering quality: severe cases should appear near the top, especially when only top-k items are reviewed.',
+  'Why do severity labels need reviewer agreement before NDCG is meaningful?':'If reviewers disagree on severity, the ranking score reflects label noise rather than ASTRAL priority quality.'
+};
 function questionBand(L){
   if(!L.questions||!L.questions.length)return '';
-  return `<div class="question-band"><div class="qtitle">Questions this lesson answers</div><div class="question-list">${L.questions.map(q=>`<div class="qitem">${q}</div>`).join('')}</div></div>`;
+  return `<div class="question-band"><div class="qtitle">Questions this lesson answers</div><div class="question-list">${L.questions.map(q=>`<div class="qitem"><b>${q}</b><span class="qa">${QUESTION_ANSWERS[q]||'This lesson answers it through the visual interaction below.'}</span></div>`).join('')}</div></div>`;
 }
 function discoverNav(){
   const i=STATE.lessonId,prev=DISCOVERY_LESSONS[i-1],next=DISCOVERY_LESSONS[i+1];
@@ -1222,8 +1250,9 @@ function renderDiscover(D){
   const L=DISCOVERY_LESSONS[STATE.lessonId];
   const metrics=L.showMetrics===false?'':`<div style="margin-top:16px">${discoverMetricStrip(D)}</div>`;
   const scenarios=L.showScenarios===false?'':scenarioCards();
-  const worldCap=L.worldCap||'ASTRAL World — scattered behavior converging to one review-priority signal. Drag the amber threshold in the field.';
-  return `<div class="discover"><div class="discover-hero"><div class="lesson-copy"><div class="lesson-kicker">Guided Discovery · ${String(STATE.lessonId+1).padStart(2,'0')} / ${DISCOVERY_LESSONS.length}</div><h2>${L.title}</h2><p>${L.body}</p>${metrics}</div><div class="world-card"><div class="cap">${worldCap}</div><div class="world-frame">${drawWorld(D)}</div></div></div>${questionBand(L)}${L.render(D)}${scenarios}${discoverNav()}</div>`;
+  const worldCap=L.worldCap||'Evidence map — sessions are scored, gated, and routed into outcomes. Drag the amber threshold in the field.';
+  const worldKey=legend([{c:C.benign,t:'benign activity'},{c:C.misuse,t:'misuse activity'},{ring:1,t:'amber outline = sent to review'}]);
+  return `<div class="discover"><div class="discover-hero"><div class="lesson-copy"><div class="lesson-kicker">Guided Discovery · ${String(STATE.lessonId+1).padStart(2,'0')} / ${DISCOVERY_LESSONS.length}</div><h2>${L.title}</h2><p>${L.body}</p>${metrics}</div><div class="world-card"><div class="cap">${worldCap}</div><div class="world-frame">${drawWorld(D)}</div>${worldKey}</div></div>${questionBand(L)}${L.render(D)}${scenarios}${discoverNav()}</div>`;
 }
 function drawReviewerDesk(D){
   const o=ensureNdcgOrder(D),rowH=34,W=620,H=54+o.length*rowH+26,deskTop=48;
@@ -1260,19 +1289,19 @@ function foundationLesson(D){
     <div class="fstep"><div class="num">01 · observe</div><h3>ASTRAL sees activity</h3><p>Most sessions are benign. A small share may contain risky misuse behavior. This is the base-rate problem every metric inherits.</p></div>
     <div class="fstep"><div class="num">02 · score</div><h3>Each session gets a score</h3><p>The score is continuous, not just yes/no. That is why AUC metrics can sweep many possible thresholds.</p></div>
     <div class="fstep"><div class="num">03 · gate</div><h3>A threshold creates a queue</h3><p>The amber line decides what reaches reviewers. Moving it changes precision, recall, false alarms, and misses together.</p></div>
-    <div class="fstep"><div class="num">04 · evaluate</div><h3>KPIs name the tradeoffs</h3><p>Every KPI is a different question about the same world: quality, burden, visibility, ranking, or explanation accuracy.</p></div>
+    <div class="fstep"><div class="num">04 · evaluate</div><h3>KPIs name the tradeoffs</h3><p>Every KPI asks about the same underlying counts: quality, burden, visibility, ranking, or explanation accuracy.</p></div>
   </div></div>
   <div class="lesson-grid"><div class="lesson-panel"><h3>The first thing to learn</h3><p>Do not start with formulas. Start with the loop: <b>activity → score → threshold → review queue → outcome</b>. The four outcomes are the nouns; the KPIs are ratios and rankings built from those nouns.</p><div class="take"><b>Foundation:</b> a threshold turns continuous scores into TP, FP, FN, and TN. Once that is clear, Signal in the noise explains why rarity makes the whole system harder to read.</div></div><div class="lesson-panel"><h3>Core KPI map</h3><div class="metric-map">${metricTiles.map(m=>`<div class="metric-tile"><b>${m[0]}</b><span>${m[1]}</span></div>`).join('')}</div></div></div>
   <div class="handoff"><p><b>Next insight:</b> now keep the model fixed and change how rare misuse is. The world looks different even when ASTRAL itself did not get worse.</p><button onclick="setLesson(1)">Continue to Signal</button></div>`;
 }
 
 const DISCOVERY_LESSONS=[
-{short:'Start',spotlight:['tau'],title:'Start with one ASTRAL world',showMetrics:false,showScenarios:false,worldCap:'ASTRAL World — one shared loop: activity becomes a score, the threshold creates a reviewer queue, and outcomes become KPIs.',
+{short:'Start',spotlight:['tau'],title:'Start with the evaluation loop',showMetrics:false,showScenarios:false,worldCap:'Evidence map — activity becomes a score, the threshold creates a reviewer queue, and outcomes become KPIs.',
  body:'Before the statistics, learn the object they are all measuring. ASTRAL turns scattered activity into a continuous risk score, draws a threshold, routes some sessions to review, and creates four outcomes. Every KPI in the sandbox is a different question about that same loop.',
  questions:['What is ASTRAL evaluating before any metric appears?','Why do we need a continuous score instead of a binary flag?','How do the core KPIs connect back to the same four outcomes?'],
  render(D){return foundationLesson(D);}},
 {short:'Signal',spotlight:['pi','tau','sep'],title:'Signal in the noise',body:'Start with the core ASTRAL thesis: scattered interaction behavior becomes one review-priority signal. Change the base rate and watch rare misuse become hard to see even when the detector has not changed.',
- questions:['If ASTRAL is good, why can the review queue still contain many benign sessions?','What changes when misuse is <b>rare</b> versus when the model itself gets worse?','Where do TP, FP, FN, and TN physically appear in one shared world?'],
+ questions:['If ASTRAL is good, why can the review queue still contain many benign sessions?','What changes when misuse is <b>rare</b> versus when the model itself gets worse?','Where do TP, FP, FN, and TN physically appear in the evidence map?'],
  render(D){return `<div class="lesson-grid"><div class="lesson-panel"><h3>Make misuse rarer</h3><p>Lower π and the world turns into a haystack. The coral cases are still the ones that matter, but the blue mass sets the operational burden.</p><div class="lesson-actions"><button class="btn amber" onclick="setSlider('pi',Math.max(0.0002,STATE.pi/4))">lower base rate π</button><button class="btn" onclick="setSlider('pi',Math.min(0.05,STATE.pi*4))">raise base rate π</button></div><div class="take"><b>Reveal:</b> rare misuse makes good-looking detectors harder to interpret.</div></div><div class="lesson-panel"><h3>Four outcomes, one matrix</h3>${drawConfusion(D)}</div></div>`;}},
 {short:'Threshold',spotlight:['tau','beta'],title:'The threshold bargain',body:'The amber line is not just a slider; it is the review gate. Tightening it can clean the queue while hiding more real misuse.',
  questions:['Why is there no perfect threshold that maximizes everything at once?','Why did we choose a recall-first north-star instead of plain accuracy?','How does moving one gate change precision, recall, and F2 together?'],
