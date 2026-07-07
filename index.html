@@ -182,6 +182,44 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bac
 .chip.misuse::before{background:var(--red)} .chip.misuse .big{color:var(--red-soft)}
 .chip.signal::before{background:var(--signal)} .chip.signal .big{color:var(--amber)}
 
+/* KPI learning cards */
+.kpi-card{background:linear-gradient(180deg,rgba(79,194,160,.045),transparent 42%),var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;box-shadow:var(--shadow)}
+.kpi-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start}
+.kpi-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.kpi-question{font-size:20px;line-height:1.25;color:var(--ink);font-weight:600;font-family:var(--display)}
+.kpi-answer{color:var(--ink-dim);margin-top:8px;max-width:70ch}
+.kpi-value{min-width:132px;text-align:right;border-left:1px solid var(--line);padding-left:14px}
+.kpi-value .big{font-family:var(--mono);font-size:36px;line-height:1;color:var(--amber);font-weight:700}
+.kpi-value .lab{font-size:11px;color:var(--ink-faint);margin-top:5px}
+.kpi-equation{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:15px;font-family:var(--mono);font-size:14px;color:var(--ink-dim);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.eqterm,.eqgroup{color:var(--amber);border-bottom:1px dotted var(--amber-dim);cursor:help;border-radius:4px;padding:0 2px}
+.eqgroup{display:inline-flex;gap:6px;align-items:center}
+.eqres{color:var(--stellar-lt);font-weight:700}
+.concept-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.concept-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:13px;min-height:132px}
+.concept-card b{display:block;font-family:var(--mono);font-size:13px;margin-bottom:7px}
+.concept-card p{margin:0;color:var(--ink-dim);font-size:12.5px;line-height:1.5}
+.concept-card.dim{opacity:.62}
+.concept-card.dim b{color:var(--ink-faint)}
+.precision-world-card,.precision-lens{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0}
+.precision-world-card .cap{font-size:11px;color:var(--ink-dim);margin-bottom:9px}
+.precision-world-frame,.precision-gate-frame,.precision-queue-frame{overflow-x:auto}
+.precision-world-frame{min-height:320px}
+.precision-lens{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.precision-lens-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.precision-lens-head p{margin:0;color:var(--ink-dim);max-width:72ch}
+.precision-lens-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:16px;align-items:stretch}
+.precision-lens-panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:258px}
+.precision-lens-panel h3{font-size:15px;letter-spacing:0;margin-bottom:7px}
+.precision-lens-panel .cap{font-size:11px;color:var(--ink-dim);margin-bottom:9px}
+.precision-example{display:grid;grid-template-columns:minmax(0,.78fr) minmax(280px,1fr);gap:16px;align-items:center}
+.precision-example p{margin:0;color:var(--ink-dim)}
+.precision-example b{color:var(--ink)}
+.precision-dots{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;min-height:128px}
+.precision-handoff{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(90deg,rgba(79,194,160,.10),rgba(231,178,76,.045));border:1px solid var(--line-bright);border-radius:8px;padding:14px 15px}
+.precision-handoff p{margin:0;color:var(--ink-dim)}
+.precision-handoff b{color:var(--ink)}
+
 /* collapsible */
 .collapse{border:1px solid var(--line);border-radius:11px;margin-top:12px;background:var(--panel);overflow:hidden}
 .collapse > button{width:100%;text-align:left;background:transparent;border:0;color:var(--ink);padding:12px 15px;font-size:12.5px;display:flex;align-items:center;gap:10px;font-family:var(--mono);letter-spacing:.03em}
@@ -263,7 +301,12 @@ body[data-focus-cohort="tp"] [data-cohort="tp"],
 body[data-focus-cohort="fp"] [data-cohort="fp"],
 body[data-focus-cohort="fn"] [data-cohort="fn"],
 body[data-focus-cohort="tn"] [data-cohort="tn"]{filter:drop-shadow(0 0 6px rgba(231,178,76,.34))}
-@media(max-width:980px){.discover-hero,.lesson-grid{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr 1fr}.question-list{grid-template-columns:1fr}.foundation-flow,.metric-map{grid-template-columns:1fr 1fr}.lesson-copy h2{font-size:26px}}
+body[data-focus-cohort="flagged"] [data-cohort]:not([data-cohort="tp"]):not([data-cohort="fp"]):not([data-cohort="flagged"]){opacity:.22;filter:saturate(.55)}
+body[data-focus-cohort="flagged"] [data-cohort="tp"],
+body[data-focus-cohort="flagged"] [data-cohort="fp"],
+body[data-focus-cohort="flagged"] [data-cohort="flagged"]{filter:drop-shadow(0 0 6px rgba(231,178,76,.34))}
+@media(max-width:980px){.discover-hero,.lesson-grid,.precision-lens-grid,.precision-example{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr 1fr}.question-list{grid-template-columns:1fr}.foundation-flow,.metric-map,.concept-grid{grid-template-columns:1fr 1fr}.lesson-copy h2{font-size:26px}.kpi-top{grid-template-columns:1fr}.kpi-value{text-align:left;border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:12px}}
+@media(max-width:620px){.concept-grid{grid-template-columns:1fr}.kpi-question{font-size:18px}.kpi-value .big{font-size:31px}.precision-handoff{align-items:flex-start;flex-direction:column}}
 @media(max-width:620px){.foundation-flow,.metric-map{grid-template-columns:1fr}.handoff{align-items:stretch;flex-direction:column}.handoff button{width:100%}}
 @media(max-width:620px){.scenario-grid{grid-template-columns:1fr}.viewseg{order:5;width:100%}.viewseg button{flex:1}.lessonbar{padding-top:6px}}
 
@@ -813,6 +856,97 @@ function drawQueue(D){
     s+=`<rect x="${W-96}" y="${ly-16}" width="94" height="13" rx="3" fill="${C.bg}" opacity="0.8"/><text x="${W-4}" y="${ly-6}" fill="${C.amber}" font-size="9.5" text-anchor="end">▲ top ${STATE.k} reviewed</text>`;}
   return svgEl(W,H,s,'queue');
 }
+function focusSpan(label,co,cls){return `<span class="${cls||'eqterm'}" ${cohortAttrs(co,true)}>${label}</span>`;}
+function precisionEquation(D){
+  const tp=focusSpan('TP','tp'),fp=focusSpan('FP','fp');
+  const denom=`<span class="eqgroup" ${cohortAttrs('flagged',true)}>${focusSpan('TP','tp')} <span>+</span> ${focusSpan('FP','fp')}</span>`;
+  return `<div class="kpi-equation" aria-label="Precision equals true positives divided by true positives plus false positives">
+    <span>Precision</span><span>=</span>${tp}<span>/</span><span>(</span>${denom}<span>)</span>
+    <span>=</span><span class="eqres">${fmtInt(D.TP)}</span><span>/</span><span>${fmtInt(D.TP+D.FP)}</span>
+    <span>=</span><span class="eqres">${fmt2(D.P)}</span><span style="color:${C.inkFaint}">· ${fp} is the benign part of the queue</span></div>`;
+}
+function drawPrecisionExampleDots(){
+  const cols=25,rows=4,cell=12,gap=6,W=cols*(cell+gap)+2,H=rows*(cell+gap)+24;let s='';
+  for(let i=0;i<100;i++){const x=1+(i%cols)*(cell+gap),y=1+Math.floor(i/cols)*(cell+gap),mis=i<18;
+    s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="${mis?C.misuse:C.benign}" opacity="${mis?.92:.58}" stroke="${mis?C.misuse:C.lineB}" stroke-width=".7"/>`;}
+  s+=`<text x="1" y="${H-5}" fill="${C.misuse}" font-size="10">18 true misuse</text>`;
+  s+=`<text x="${W-1}" y="${H-5}" fill="${C.benign}" font-size="10" text-anchor="end">82 benign false alarms</text>`;
+  return svgEl(W,H,s,'precision-example');
+}
+function drawPrecisionWorld(D){
+  const W=980,H=320,x0=74,x1=646,y0=66,y1=226,tauX=x0+STATE.tau*(x1-x0),sessions=visualSessions(D);
+  const flagged=sessions.filter(s=>s.flagged).sort((a,b)=>b.score-a.score);
+  let s='';
+  s+=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="${C.bg}"/>`;
+  s+=`<text x="22" y="32" fill="${C.spindle}" font-size="10" font-family="var(--mono)" letter-spacing="2.2">PRECISION VIEW · what enters review?</text>`;
+  s+=`<rect x="${x0}" y="${y0-18}" width="${x1-x0}" height="${y1-y0+36}" rx="8" fill="${C.panel}" stroke="${C.line}"/>`;
+  s+=`<rect x="${tauX}" y="${y0-18}" width="${x1-tauX}" height="${y1-y0+36}" fill="${C.amber}" opacity=".055"/>`;
+  [0,.25,.5,.75,1].forEach(v=>{const x=x0+v*(x1-x0);s+=`<line x1="${x}" y1="${y0-9}" x2="${x}" y2="${y1+9}" stroke="${C.line}" stroke-width="1"/><text x="${x}" y="${y1+27}" fill="${C.inkFaint}" font-size="9" text-anchor="middle">${v}</text>`;});
+  s+=`<text x="${x0}" y="${y0-30}" fill="${C.inkDim}" font-size="10">not in Precision denominator</text>`;
+  s+=`<text x="${x1}" y="${y0-30}" fill="${C.amber}" font-size="10" text-anchor="end">review queue = TP + FP</text>`;
+  s+=`<rect data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" x="${x0}" y="${y0-18}" width="${x1-x0}" height="${y1-y0+36}" fill="transparent" style="cursor:ew-resize"/>`;
+  s+=`<line x1="${tauX}" y1="${y0-34}" x2="${tauX}" y2="${y1+20}" stroke="${C.amber}" stroke-width="2"/>`;
+  s+=`<g class="drag" data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" style="cursor:ew-resize"><rect x="${tauX-48}" y="${y0-55}" width="96" height="23" rx="5" fill="${C.amber}"/><text x="${tauX}" y="${y0-39}" fill="#20160a" font-size="11" font-weight="700" text-anchor="middle">drag gate ↔</text></g>`;
+  sessions.forEach((it,i)=>{const x=x0+it.score*(x1-x0),base=y0+((i*31)%13)*(y1-y0)/12,dy=(((i*19)%7)-3)*1.1,y=base+dy,co=it.co;
+    const faint=co==='fn'||co==='tn',fill=it.isMis?C.misuse:C.benign,op=faint?.22:(it.isMis?.9:.58),r=it.isMis?4.5:3.5;
+    s+=`<circle ${cohortAttrs(co)} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${fill}" opacity="${op}" stroke="${it.flagged?C.amber:'transparent'}" stroke-width="${it.flagged?1.2:0}"/>`;});
+  s+=`<rect x="704" y="58" width="118" height="182" rx="8" fill="${C.panel2}" stroke="${C.amber}" stroke-opacity=".65"/>`;
+  s+=`<text x="763" y="80" fill="${C.amber}" font-size="10" font-family="var(--mono)" text-anchor="middle">TP + FP</text>`;
+  flagged.slice(0,42).forEach((it,i)=>{const x=720+(i%6)*15,y=96+Math.floor(i/6)*15,co=it.isMis?'tp':'fp';
+    s+=`<rect ${cohortAttrs(co)} x="${x}" y="${y}" width="10.5" height="10.5" rx="2.5" fill="${it.isMis?C.misuse:C.benign}" opacity="${it.isMis?.9:.58}" stroke="${C.amber}" stroke-width=".6"/>`;});
+  s+=`<text x="763" y="226" fill="${C.inkDim}" font-size="10" text-anchor="middle">review queue</text>`;
+  const cells=[['tp','TP',D.TP,C.misuse,'real misuse flagged'],['fp','FP',D.FP,C.benign,'benign but flagged'],['fn','FN',D.FN,C.misuse,'not counted here'],['tn','TN',D.TN,C.benign,'not counted here']];
+  cells.forEach((b,i)=>{const x=852,y=58+i*48,active=i<2,hide=STATE.mode==='operational'&&b[0]==='fn';
+    s+=`<g ${cohortAttrs(b[0])}><rect x="${x}" y="${y}" width="96" height="38" rx="7" fill="${b[3]}" opacity="${active?.16:.055}" stroke="${active?C.amber:C.line}" ${!active?'stroke-dasharray="4 3"':''}/>`;
+    s+=`<text x="${x+9}" y="${y+16}" fill="${active?C.ink:C.inkFaint}" font-size="10" font-weight="700">${b[1]}</text><text x="${x+37}" y="${y+16}" fill="${active?C.ink:C.inkFaint}" font-size="10">${hide?'hidden':fmtInt(b[2])}</text>`;
+    s+=`<text x="${x+9}" y="${y+31}" fill="${C.inkFaint}" font-size="8.5">${b[4]}</text></g>`;});
+  s+=`<text x="74" y="286" fill="${C.benign}" font-size="10">blue = benign</text><text x="174" y="286" fill="${C.misuse}" font-size="10">coral = misuse</text><text x="286" y="286" fill="${C.amber}" font-size="10">amber = sent to review</text>`;
+  return svgEl(W,H,s,'precision-world');
+}
+function drawPrecisionGate(D){
+  const W=960,H=236,m={l:42,r:28,t:40,b:40},x0=m.l,x1=W-m.r,sc=scaler(0,1,0,1,W,H,m),sx=sc.sx,sy=sc.sy;
+  const NS=180;let ben=[],mis=[],mx=0;
+  for(let i=0;i<=NS;i++){const score=0.004+0.992*i/NS,d=densAt(STATE,D.muB,D.muM,score);ben.push({x:score,y:d.ben});mis.push({x:score,y:d.mis});mx=Math.max(mx,d.ben,d.mis);}
+  ben.forEach(p=>p.y/=mx||1);mis.forEach(p=>p.y/=mx||1);
+  const area=pts=>pathFrom(pts,sx,sy)+` L ${sx(pts[pts.length-1].x)} ${sy(0)} L ${sx(pts[0].x)} ${sy(0)} Z`;
+  const Xt=sx(STATE.tau);let s='';
+  s+=grid(sc,[.25,.5,.75],[]);
+  s+=`<rect x="${Xt}" y="${m.t}" width="${W-m.r-Xt}" height="${H-m.t-m.b}" fill="${C.amber}" opacity=".055"/>`;
+  s+=`<path d="${area(ben)}" fill="url(#gBenign)"/><path d="${area(mis)}" fill="url(#gRed)"/>`;
+  s+=`<path d="${pathFrom(ben,sx,sy)}" fill="none" stroke="${C.stellar}" stroke-width="1.6"/><path d="${pathFrom(mis,sx,sy)}" fill="none" stroke="${C.red}" stroke-width="1.6"/>`;
+  s+=`<rect data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" x="${x0}" y="${m.t}" width="${x1-x0}" height="${H-m.t-m.b}" fill="transparent" style="cursor:ew-resize"/>`;
+  s+=`<line x1="${Xt}" y1="${m.t-10}" x2="${Xt}" y2="${H-m.b}" stroke="${C.amber}" stroke-width="2.5"/>`;
+  s+=`<g class="drag" data-drag="tauWorld" data-x0="${x0}" data-x1="${x1}" style="cursor:ew-resize"><rect x="${Xt-48}" y="${m.t-32}" width="96" height="22" rx="5" fill="${C.amber}"/><text x="${Xt}" y="${m.t-17}" fill="#20160a" font-size="11" font-weight="700" text-anchor="middle">τ ${STATE.tau.toFixed(2)} ↔</text></g>`;
+  s+=`<text x="${x0}" y="24" fill="${C.inkDim}" font-size="10">looser gate: more TP and more FP</text><text x="${x1}" y="24" fill="${C.amber}" font-size="10" text-anchor="end">stricter gate: cleaner queue, more misses possible</text>`;
+  s+=ticks(sc,[{v:0,l:'0'},{v:.5,l:'0.5'},{v:1,l:'1'}]);
+  s+=`<text x="${W/2}" y="${H-7}" fill="${C.inkDim}" font-size="10" text-anchor="middle">ASTRAL risk score →</text>`;
+  return svgEl(W,H,s,'precision-gate');
+}
+function drawPrecisionQueueLarge(D){
+  const cols=20,rows=5,cell=22,gap=7,W=cols*(cell+gap)+2,H=rows*(cell+gap)+34,list=D.flagged.slice(0,100);let s='';
+  for(let i=0;i<100;i++){const it=list[i],x=1+(i%cols)*(cell+gap),y=1+Math.floor(i/cols)*(cell+gap);
+    if(it){const co=it.isMis?'tp':'fp',seen=i<STATE.k;s+=`<rect ${cohortAttrs(co)} x="${x}" y="${y}" width="${cell}" height="${cell}" rx="4" fill="${it.isMis?C.misuse:C.benign}" opacity="${it.isMis?.92:.58}" stroke="${seen?C.amber:C.lineB}" stroke-width="${seen?1.4:.8}"/>`;}
+    else s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="4" fill="${C.panel3}" opacity=".24" stroke="${C.line}" stroke-width=".7"/>`;}
+  s+=`<text x="1" y="${H-8}" fill="${C.inkDim}" font-size="10">top flagged sessions shown · amber outline = within current reviewer capacity</text>`;
+  s+=`<text x="${W-1}" y="${H-8}" fill="${C.inkFaint}" font-size="10" text-anchor="end">${fmtInt(D.TP+D.FP)} total flags / 100,000</text>`;
+  return svgEl(W,H,s,'precision-queue-large');
+}
+function precisionLearningView(D){
+  return `<div class="sec"><div class="kpi-card"><div class="kpi-top"><div><div class="kpi-eyebrow">KPI 2 · Queue quality</div><div class="kpi-question">When ASTRAL flags something, how often is it truly misuse?</div><div class="kpi-answer">Precision is the share of the reviewer queue that pays off. It is built from only two outcomes: true positives and false positives.</div></div><div class="kpi-value"><div class="big tnum">${fmt2(D.P)}</div><div class="lab">current precision</div></div></div>${precisionEquation(D)}</div></div>
+  <div class="sec"><div class="lbl">Only two outcomes enter this KPI</div><div class="concept-grid">
+    <div class="concept-card" ${cohortAttrs('tp',true)}><b style="color:${C.misuse}">TP · true positive</b><p>Real misuse that ASTRAL correctly sends to review. TP is the numerator: the useful part of the queue.</p></div>
+    <div class="concept-card" ${cohortAttrs('fp',true)}><b style="color:${C.benign}">FP · false positive</b><p>Benign activity that crosses the gate anyway. FP is the noise that lowers Precision.</p></div>
+    <div class="concept-card dim" ${cohortAttrs('fn',true)}><b>FN · false negative</b><p>Real misuse that slipped past. It matters for Recall, but it is not inside this equation.</p></div>
+    <div class="concept-card dim" ${cohortAttrs('tn',true)}><b>TN · true negative</b><p>Benign activity left alone. It matters for FPR, but not for queue quality.</p></div>
+  </div></div>
+  <div class="sec"><div class="lbl">ASTRAL World: flagged versus not flagged</div><div class="precision-world-card"><div class="cap">The amber gate creates the reviewer queue. Precision looks only to the right side of that gate: <b>TP + FP</b>.</div><div class="precision-world-frame">${drawPrecisionWorld(D)}</div></div></div>
+  <div class="sec"><div class="lbl">Easy ASTRAL example</div><div class="precision-example"><p><b>Imagine ASTRAL flags 100 sessions.</b><br>18 are confirmed misuse and 82 are benign research that looked suspicious. Precision is <span class="mono" style="color:${C.amber}">18 / (18 + 82) = 18%</span>, so reviewers open about <span class="mono">5.6</span> sessions to find one real case.</p><div class="precision-dots">${drawPrecisionExampleDots()}</div></div></div>
+  <div class="sec"><div class="lbl">Precision Lens</div><div class="precision-lens"><div class="precision-lens-head"><p><b>Make one move:</b> drag the gate or use the prediction prompt. Watch TP and FP change together before reading the final number.</p>${predictionPrompt('precision-tau-up','If the threshold gets stricter, what usually happens to Precision?','Precision often goes up.','Fewer benign sessions clear the gate, so false alarms usually fall. But some real misuse can now sit below the gate, which is why Recall and F2 still matter.',`<button class="btn amber" onclick="setSlider('tau',Math.min(0.95,STATE.tau+0.12))">raise threshold τ</button>`)}</div><div class="precision-lens-grid"><div class="precision-lens-panel"><h3>Threshold gate</h3><div class="cap">Drag the amber handle directly. The shaded region is what reaches reviewers.</div><div class="precision-gate-frame">${drawPrecisionGate(D)}</div></div><div class="precision-lens-panel"><h3>Reviewer queue</h3><div class="cap">Coral squares are true misuse; blue squares are false alarms. Precision is the coral share of this queue.</div><div class="precision-queue-frame">${drawPrecisionQueueLarge(D)}</div></div></div><div class="chips">${chip('hero',fmt2(D.P),'precision','TP / all flags')}${chip('misuse',fmtInt(D.TP),'caught (TP)','useful flags')}${chip('benign',fmtInt(D.FP),'false alarms','benign flags')}${chip('info',D.NNR!=null?D.NNR.toFixed(1):'—','number-needed-to-review','sessions opened per real case')}</div></div></div>
+  <div class="sec"><div class="precision-handoff"><p><b>Precision tells us queue quality.</b> It does not tell us how much misuse ASTRAL missed. That is why FPR prices benign friction, Recall asks what escaped, and F2 ties the tradeoff back to the north-star.</p><button class="btn amber" onclick="setTab(4)">jump to Recall</button></div></div>
+  ${collapseMath('pr',`precision = TP / (TP + FP) = <span class="v">${fmtInt(D.TP)}</span> / (<span class="v">${fmtInt(D.TP)}</span> + <span class="v">${fmtInt(D.FP)}</span>) = <span class="res">${fmt2(D.P)}</span>  ·  number-needed-to-review = 1/precision = <span class="res">${D.NNR!=null?D.NNR.toFixed(2):'—'}</span>`)}
+  ${modeNote('Every flagged session has a known label — count real vs. false alarms directly.','Reviewers only reach the top of the queue, so what you can actually measure live is <b>precision@k</b> — the share correct among the top '+STATE.k+' they open (here <b>'+fmt2(D.precK)+'</b>).')}
+  ${breaks('pr','When misuse is rare and some benign science looks suspicious (dual-use), the queue fills with plausible false alarms and precision collapses — even with an accurate detector.','dualuse')}`;
+}
 function hash2(c,r){let h=(c*374761393+r*668265263)>>>0;h=((h^(h>>>13))*1274126177)>>>0;return (h^(h>>>16))>>>0;}
 function drawFpr(D){
   const cols=50,rows=16,cell=8,gap=2;const W=cols*(cell+gap)+2,H=rows*(cell+gap)+2;let s='';
@@ -1198,16 +1332,8 @@ const TABS=[
 {short:'Precision',spotlight:['tau','k','pi'],dir:'up',
  title:'KPI 2 · Precision — how much of the queue is worth it',
  gloss:'Of the sessions we send to a reviewer, what fraction are actually real misuse? The noise-in-the-queue metric.',
- guide:'Slide <b>base rate π</b> down toward 0.1%. The queue turns mostly red — at rare base rates most flags are false alarms, even from a good detector. This is the trap the next tabs explain.',
- render(D){return `<div class="sec"><div class="lbl">What it measures</div><div class="card plainly">
-    Every false alarm is a real person’s time spent on a session that was never misuse. Precision is the share of flags that pay off.
-    <div class="take"><b>Takeaway:</b> low precision burns reviewer hours — most of their day goes to sessions that were never misuse.</div></div></div>
-  <div class="sec"><div class="lbl">The reviewer’s queue</div><div class="card"><div class="cap">Top of the flagged list, ranked by score. Real cases rise toward the top; the dashed line is how far down a reviewer can actually get today.</div>
-    <div class="plotwrap">${drawQueue(D)}</div>${legend([{c:C.misuse,t:'real misuse (worth it)'},{c:C.benign,t:'false alarm (wasted)'},{ring:1,t:'above dashed line = reviewed'}])}</div>
-    <div class="chips" style="margin-top:14px">${chip('hero',fmt2(D.P),'precision','of flags, the share that are real')}${chip('info',D.NNR!=null?D.NNR.toFixed(1):'—','number-needed-to-review','sessions opened to find 1 real case')}</div></div>
-  ${collapseMath('pr',`precision = TP / (TP + FP) = <span class="v">${fmtInt(D.TP)}</span> / (<span class="v">${fmtInt(D.TP)}</span> + <span class="v">${fmtInt(D.FP)}</span>) = <span class="res">${fmt2(D.P)}</span>  ·  number-needed-to-review = 1/precision = <span class="res">${D.NNR!=null?D.NNR.toFixed(2):'—'}</span>`)}
-  ${modeNote('Every flagged session has a known label — count real vs. false alarms directly.','Reviewers only reach the top of the queue, so what you can actually measure live is <b>precision@k</b> — the share correct among the top '+STATE.k+' they open (here <b>'+fmt2(D.precK)+'</b>).')}
-  ${breaks('pr','When misuse is rare and some benign science looks suspicious (dual-use), the queue fills with plausible false alarms and precision collapses — even with an “accurate” detector.','dualuse')}`;}},
+ guide:'Drag the big <b>threshold τ</b> gate below. A stricter gate can make the queue cleaner, but at rare base rates the blue false alarms can still dominate the review workload.',
+ render(D){return precisionLearningView(D);}},
 
 {short:'FPR',spotlight:['tau','pi','sep'],dir:'down',
  title:'KPI 3 · False Positive Rate — friction on legitimate users',
